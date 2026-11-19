@@ -11,6 +11,10 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:4000/api/v1
+      API_INTERNAL_URL: http://127.0.0.1:4000/api/v1
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
