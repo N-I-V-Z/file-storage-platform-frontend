@@ -17,6 +17,9 @@ vi.mock("../src/features/projects/api/projects.api", () => ({
   listProjects: vi.fn(),
   createProject: vi.fn(),
 }));
+vi.mock("../src/features/api-keys/components/api-key-panel", () => ({
+  ApiKeyPanel: () => <div>API keys</div>,
+}));
 
 const project = {
   id: "00000000-0000-4000-8000-000000000001",

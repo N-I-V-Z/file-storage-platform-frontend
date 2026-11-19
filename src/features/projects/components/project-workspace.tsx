@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ApiError } from "@/src/lib/http/api-client";
+import { ApiKeyPanel } from "@/src/features/api-keys/components/api-key-panel";
 import { createProject } from "../api/projects.api";
 import { projectKeys } from "../api/projects.keys";
 import { useProjects } from "../hooks/use-projects";
@@ -20,6 +21,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState("");
+  const [keyIssuing, setKeyIssuing] = useState(false);
   const createTrigger = useRef<HTMLButtonElement>(null);
   const {
     register,
@@ -48,6 +50,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
     null;
 
   async function submit(values: CreateProjectValues) {
+    if (keyIssuing) return;
     setFormError("");
     try {
       await createMutation.mutateAsync(values);
@@ -107,6 +110,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
                     aria-current={
                       selected?.id === project.id ? "true" : undefined
                     }
+                    disabled={keyIssuing && selected?.id !== project.id}
                     onClick={() => setSelectedId(project.id)}
                   >
                     <span className="project-item-icon" aria-hidden="true">
@@ -123,6 +127,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
           ref={createTrigger}
           type="button"
           className="button button-outline rail-create"
+          disabled={keyIssuing}
           onClick={() => {
             setFormError("");
             setCreating(true);
@@ -168,7 +173,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
               <button
                 type="submit"
                 className="button button-primary"
-                disabled={createMutation.isPending}
+                disabled={createMutation.isPending || keyIssuing}
                 aria-busy={createMutation.isPending}
               >
                 {createMutation.isPending ? "Đang lưu..." : "Lưu project"}
@@ -195,15 +200,11 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
             <p className="detail-intro">
               Quản lý quyền truy cập và API key cho project này.
             </p>
-            <div className="key-placeholder">
-              <span className="coming-icon" aria-hidden="true">
-                ◇
-              </span>
-              <div>
-                <h3>API keys</h3>
-                <p>Tạo và quản lý key truy cập cho ứng dụng của bạn.</p>
-              </div>
-            </div>
+            <ApiKeyPanel
+              key={selected.id}
+              projectId={selected.id}
+              onIssuingChange={setKeyIssuing}
+            />
           </>
         ) : (
           <div className="project-empty">
