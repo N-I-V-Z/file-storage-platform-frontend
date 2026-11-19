@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
+import { ProjectWorkspace } from "@/src/features/projects/components/project-workspace";
 
 export function DashboardHome() {
   const router = useRouter();
@@ -66,13 +67,7 @@ export function DashboardHome() {
             {error}
           </p>
         )}
-        <section className="coming-soon" aria-labelledby="coming-title">
-          <span className="coming-icon">▣</span>
-          <div>
-            <h2 id="coming-title">Không gian lưu trữ của bạn</h2>
-            <p>Quản lý dự án và tệp sẽ có trong giai đoạn tiếp theo.</p>
-          </div>
-        </section>
+        <ProjectWorkspace key={user.id} userId={user.id} />
       </div>
     </main>
   );

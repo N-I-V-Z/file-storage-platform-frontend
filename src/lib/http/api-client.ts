@@ -19,6 +19,9 @@ function errorMessage(status: number): string {
   if (status === 401)
     return "Email hoặc mật khẩu không đúng, hoặc phiên đã hết hạn.";
   if (status === 409) return "Email này đã được sử dụng.";
+  if (status === 403) return "Bạn không có quyền thực hiện thao tác này.";
+  if (status === 404)
+    return "Không tìm thấy tài nguyên hoặc bạn không có quyền truy cập.";
   if (status === 429)
     return "Bạn đã thử quá nhiều lần. Vui lòng chờ rồi thử lại.";
   if (status >= 500) return "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.";
@@ -122,17 +125,31 @@ export class ApiClient {
     return this.refreshPromise;
   }
 
-  async request<T>(
+  private async sendAuthenticated(
     path: string,
-    schema: z.ZodType<T>,
-    init: RequestInit = {},
-  ): Promise<T> {
+    init: RequestInit,
+  ): Promise<Response> {
     const token = this.accessToken;
     let response = await this.send(path, init, token);
     if (response.status === 401 && token && (await this.refresh())) {
       response = await this.send(path, init, this.accessToken);
     }
+    return response;
+  }
+
+  async request<T>(
+    path: string,
+    schema: z.ZodType<T>,
+    init: RequestInit = {},
+  ): Promise<T> {
+    const response = await this.sendAuthenticated(path, init);
     return this.parse(response, schema);
+  }
+
+  async requestNoContent(path: string, init: RequestInit): Promise<void> {
+    const response = await this.sendAuthenticated(path, init);
+    if (!response.ok)
+      throw new ApiError(response.status, errorMessage(response.status));
   }
 
   async me(): Promise<User> {

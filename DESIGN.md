@@ -34,7 +34,7 @@ components:
 
 ## Overview
 
-The visual reference is a quiet file index: aligned paths, compact metadata, and one clear action at a time. The current product serves people setting up private storage. Authentication is the first usable workflow; project and file management are later phases. UI copy is Vietnamese; technical path labels may remain English. The home page carries the file index motif. Forms and dashboard keep conventional controls and restrained density.
+The visual reference is a quiet file index: aligned paths, compact metadata, and one clear action at a time. The current product serves people setting up private storage. Authentication and project/API key management are usable workflows; file management is a later phase. UI copy is Vietnamese; technical path labels may remain English. The home page carries the file index motif. Forms and dashboard keep conventional controls and restrained density.
 
 ## Tokens and layout
 
@@ -42,8 +42,8 @@ The visual reference is a quiet file index: aligned paths, compact metadata, and
 
 ## Components and states
 
-Buttons have solid primary and outlined secondary styles, visible focus, hover, pressed, disabled, and busy text states. Inputs use visible labels, 50px height, associated inline errors, and `aria-invalid`. Submit errors stay in an alert near the action. The dashboard shows a loading status until the cookie session has been checked. Failed logout keeps the session visible and offers retry through the same button.
+Buttons have solid primary and outlined secondary styles, visible focus, hover, pressed, disabled, and busy text states. Inputs use visible labels, 50px height, associated inline errors, and `aria-invalid`. Submit errors stay in an alert near the action. The dashboard shows a loading status until the cookie session has been checked. Failed logout keeps the session visible and offers retry through the same button. The dashboard uses a compact project rail beside the selected project's detail, stacking them below 850px. The API key list shows scope tags and metadata; a separate panel shows a newly issued secret once with copy and close actions. Revoke uses an inline confirmation, not a modal.
 
 ## Motion and content
 
-Only button hover uses a short translation; reduced motion disables it. Avoid decorative animation in forms. Use direct action labels such as “Đăng nhập” and “Tạo tài khoản.” Never display raw API errors or tokens. Keep private content hidden until authentication finishes.
+Only button hover uses a short translation; reduced motion disables it. Avoid decorative animation in forms. Use direct action labels such as “Đăng nhập” and “Tạo tài khoản.” Never display raw API errors. Show a new API key only in the temporary secret panel; never show it in the metadata list. Keep private content hidden until authentication finishes. See `UX-CONTRACT.md` for dashboard state and focus behavior.

@@ -8,6 +8,26 @@ const json = (status: number, body: unknown) =>
   });
 
 describe("ApiClient", () => {
+  it("accepts a 204 mutation response without parsing JSON", async () => {
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) =>
+        String(input).includes("/projects/") && init?.method === "DELETE"
+          ? new Response(null, { status: 204 })
+          : json(500, {}),
+    );
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      fetcher as typeof fetch,
+    );
+    client.setAccessToken("access");
+
+    await expect(
+      client.requestNoContent("/projects/id", { method: "DELETE" }),
+    ).resolves.toBeUndefined();
+    expect(
+      new Headers(fetcher.mock.calls[0]?.[1]?.headers).get("Authorization"),
+    ).toBe("Bearer access");
+  });
   it("rotates one refresh token for concurrent expired requests", async () => {
     const fetcher = vi.fn(
       async (input: RequestInfo | URL, init?: RequestInit) => {
