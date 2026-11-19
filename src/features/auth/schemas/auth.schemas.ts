@@ -17,3 +17,12 @@ export const registerSchema = z.object({
 
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
+
+export const userSchema = z.object({ id: z.string().min(1), email: z.email() });
+export const loginResponseSchema = z.object({
+  accessToken: z.string().min(1),
+  user: userSchema,
+});
+export const refreshResponseSchema = z.object({
+  accessToken: z.string().min(1),
+});

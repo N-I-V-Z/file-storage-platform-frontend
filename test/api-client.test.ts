@@ -99,4 +99,25 @@ describe("ApiClient", () => {
     expect(fetcher).toHaveBeenCalledTimes(3);
     expect(onSessionLost).toHaveBeenCalledTimes(1);
   });
+
+  it("rejects malformed login responses without storing a token", async () => {
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) =>
+        String(input).endsWith("/auth/login")
+          ? json(200, { accessToken: "token", user: { id: "u1" } })
+          : json(401, { method: init?.method }),
+    );
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      fetcher as typeof fetch,
+    );
+
+    await expect(
+      client.login({ email: "a@example.com", password: "password123456" }),
+    ).rejects.toMatchObject({ status: 502 });
+    await expect(client.me()).rejects.toMatchObject({ status: 401 });
+    expect(
+      new Headers(fetcher.mock.calls[1]?.[1]?.headers).has("Authorization"),
+    ).toBe(false);
+  });
 });

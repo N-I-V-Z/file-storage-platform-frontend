@@ -1,9 +1,10 @@
-import type {
-  LoginResponse,
-  RefreshResponse,
-  User,
-  Credentials,
-} from "../../features/auth/types/auth.types";
+import type { User, Credentials } from "../../features/auth/types/auth.types";
+import {
+  loginResponseSchema,
+  refreshResponseSchema,
+  userSchema,
+} from "../../features/auth/schemas/auth.schemas";
+import type { z } from "zod";
 
 export class ApiError extends Error {
   constructor(
@@ -66,27 +67,32 @@ export class ApiClient {
     });
   }
 
-  private async parse<T>(response: Response): Promise<T> {
+  private async parse<T>(response: Response, schema: z.ZodType<T>): Promise<T> {
     if (!response.ok)
       throw new ApiError(response.status, errorMessage(response.status));
-    return response.json() as Promise<T>;
+    const result = schema.safeParse(await response.json());
+    if (!result.success)
+      throw new ApiError(502, "Máy chủ trả dữ liệu không hợp lệ.");
+    return result.data;
   }
 
   async register(credentials: Credentials): Promise<User> {
-    return this.parse<User>(
+    return this.parse(
       await this.send("/auth/register", {
         method: "POST",
         body: JSON.stringify(credentials),
       }),
+      userSchema,
     );
   }
 
   async login(credentials: Credentials): Promise<User> {
-    const result = await this.parse<LoginResponse>(
+    const result = await this.parse(
       await this.send("/auth/login", {
         method: "POST",
         body: JSON.stringify(credentials),
       }),
+      loginResponseSchema,
     );
     this.setAccessToken(result.accessToken);
     return result.user;
@@ -102,7 +108,7 @@ export class ApiClient {
           if (currentGeneration === this.generation) this.clearSession();
           return false;
         }
-        const result = (await response.json()) as RefreshResponse;
+        const result = await this.parse(response, refreshResponseSchema);
         if (currentGeneration !== this.generation) return false;
         this.setAccessToken(result.accessToken);
         return true;
@@ -116,17 +122,21 @@ export class ApiClient {
     return this.refreshPromise;
   }
 
-  async request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  async request<T>(
+    path: string,
+    schema: z.ZodType<T>,
+    init: RequestInit = {},
+  ): Promise<T> {
     const token = this.accessToken;
     let response = await this.send(path, init, token);
     if (response.status === 401 && token && (await this.refresh())) {
       response = await this.send(path, init, this.accessToken);
     }
-    return this.parse<T>(response);
+    return this.parse(response, schema);
   }
 
   async me(): Promise<User> {
-    return this.request<User>("/auth/me");
+    return this.request("/auth/me", userSchema);
   }
 
   async logout(): Promise<void> {
