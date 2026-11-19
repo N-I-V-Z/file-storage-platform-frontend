@@ -1,0 +1,10 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["app", "src"],
+  "locale": "vi-VN",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Select/Listbox", "Form", "CRUD"],
+  "ownership": {
+    "Select/Listbox": "native"
+  }
+}
