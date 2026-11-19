@@ -4,7 +4,14 @@ import {
   refreshResponseSchema,
   userSchema,
 } from "../../features/auth/schemas/auth.schemas";
-import type { z } from "zod";
+import { z } from "zod";
+
+const successEnvelopeSchema = z.strictObject({
+  success: z.literal(true),
+  data: z.unknown(),
+  timestamp: z.iso.datetime(),
+  meta: z.record(z.string(), z.unknown()).optional(),
+});
 
 export class ApiError extends Error {
   constructor(
@@ -73,7 +80,13 @@ export class ApiClient {
   private async parse<T>(response: Response, schema: z.ZodType<T>): Promise<T> {
     if (!response.ok)
       throw new ApiError(response.status, errorMessage(response.status));
-    const result = schema.safeParse(await response.json());
+    const body: unknown = await response.json();
+    const isEnvelope =
+      typeof body === "object" && body !== null && "success" in body;
+    const envelope = isEnvelope ? successEnvelopeSchema.safeParse(body) : null;
+    if (envelope && !envelope.success)
+      throw new ApiError(502, "Máy chủ trả dữ liệu không hợp lệ.");
+    const result = schema.safeParse(envelope ? envelope.data.data : body);
     if (!result.success)
       throw new ApiError(502, "Máy chủ trả dữ liệu không hợp lệ.");
     return result.data;

@@ -29,6 +29,30 @@ describe("API key contract", () => {
     await expect(listApiKeys(projectId, client)).resolves.toEqual([metadata]);
   });
 
+  it("reads an issued secret from a success envelope", async () => {
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      vi.fn(async () =>
+        Response.json(
+          {
+            success: true,
+            data: { ...metadata, token },
+            timestamp: "2026-11-19T00:00:00.000Z",
+          },
+          { status: 201 },
+        ),
+      ) as typeof fetch,
+    );
+    await expect(
+      issueApiKey(
+        projectId,
+        { name: "Reader", scopes: ["files:read"], expiration: "90" },
+        client,
+        new Date("2026-11-19T00:00:00.000Z"),
+      ),
+    ).resolves.toMatchObject({ token });
+  });
+
   it("rejects any secret in a list response", async () => {
     const client = new ApiClient(
       "http://localhost/api/v1",

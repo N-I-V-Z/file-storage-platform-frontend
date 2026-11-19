@@ -6,8 +6,64 @@ const json = (status: number, body: unknown) =>
     status,
     headers: { "Content-Type": "application/json" },
   });
+const wrapped = (status: number, data: unknown) =>
+  json(status, {
+    success: true,
+    data,
+    timestamp: "2026-11-19T00:00:00.000Z",
+  });
 
 describe("ApiClient", () => {
+  it("reads enveloped register and login responses", async () => {
+    const user = { id: "u1", email: "a@example.com" };
+    const fetcher = vi.fn(async (input: RequestInfo | URL) =>
+      String(input).endsWith("/auth/register")
+        ? wrapped(201, user)
+        : wrapped(200, { accessToken: "fresh", user }),
+    );
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      fetcher as typeof fetch,
+    );
+    const credentials = { email: user.email, password: "password123456" };
+    await expect(client.register(credentials)).resolves.toEqual(user);
+    await expect(client.login(credentials)).resolves.toEqual(user);
+  });
+
+  it("refreshes and retries me with enveloped responses", async () => {
+    const user = { id: "u1", email: "a@example.com" };
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        const path = String(input);
+        if (path.endsWith("/auth/refresh"))
+          return wrapped(200, { accessToken: "fresh", user });
+        if (new Headers(init?.headers).get("Authorization") === "Bearer stale")
+          return json(401, { success: false });
+        return wrapped(200, user);
+      },
+    );
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      fetcher as typeof fetch,
+    );
+    client.setAccessToken("stale");
+    await expect(client.me()).resolves.toEqual(user);
+    expect(fetcher).toHaveBeenCalledTimes(3);
+  });
+
+  it("rejects an invalid success envelope instead of trusting nested data", async () => {
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      vi.fn(async () =>
+        json(200, {
+          success: true,
+          data: { id: "u1", email: "a@example.com" },
+          timestamp: "not-a-date",
+        }),
+      ) as typeof fetch,
+    );
+    await expect(client.me()).rejects.toMatchObject({ status: 502 });
+  });
   it("accepts a 204 mutation response without parsing JSON", async () => {
     const fetcher = vi.fn(
       async (input: RequestInfo | URL, init?: RequestInit) =>

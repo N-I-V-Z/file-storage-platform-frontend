@@ -32,6 +32,20 @@ describe("projects API", () => {
     await expect(listProjects(client)).resolves.toEqual([project]);
   });
 
+  it("loads projects from a success envelope", async () => {
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      vi.fn(async () =>
+        Response.json({
+          success: true,
+          data: [project],
+          timestamp: "2026-11-19T00:00:00.000Z",
+        }),
+      ) as typeof fetch,
+    );
+    await expect(listProjects(client)).resolves.toEqual([project]);
+  });
+
   it("rejects malformed project data", async () => {
     const fetcher = vi.fn(async () =>
       Response.json([{ id: "bad", name: "Media" }]),
