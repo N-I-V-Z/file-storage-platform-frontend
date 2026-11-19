@@ -14,7 +14,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write app public src test *.ts *.mjs *.json",
     "format:check": "prettier --check app public src test *.ts *.mjs *.json",
-    "test": "node --test test/*.test.mjs",
+    "test": "node --test test/*.test.mjs && vitest run",
     "prepare": "husky"
   },
   "dependencies": {
