@@ -1,0 +1,19 @@
+name: Check PR Source Branch for Main
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify head branch is develop
+        run: |
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "Error: Only 'develop' can be merged into 'main'. Current source branch: '${{ github.head_ref }}'"
+            exit 1
+          fi
+          echo "Valid source branch: develop"
