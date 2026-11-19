@@ -10,10 +10,11 @@ jobs:
   check-source-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify head branch is develop
+      - name: Verify head branch is develop or hotfix/*
         run: |
-          if [ "${{ github.head_ref }}" != "develop" ]; then
-            echo "Error: Only 'develop' can be merged into 'main'. Current source branch: '${{ github.head_ref }}'"
+          HEAD_BRANCH="${{ github.head_ref }}"
+          if [[ "$HEAD_BRANCH" != "develop" && "$HEAD_BRANCH" != hotfix/* ]]; then
+            echo "Error: Only 'develop' or 'hotfix/*' can be merged into 'main'. Current source branch: '$HEAD_BRANCH'"
             exit 1
           fi
-          echo "Valid source branch: develop"
+          echo "Valid source branch: $HEAD_BRANCH"
