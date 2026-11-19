@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/src/lib/http/api-client";
 import type { Credentials, User } from "../types/auth.types";
 
@@ -20,13 +21,17 @@ type AuthState = {
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [pending, setPending] = useState(true);
 
   useEffect(() => {
     let active = true;
     const unsubscribe = apiClient.onSessionLost(() => {
-      if (active) setUser(null);
+      if (active) {
+        queryClient.clear();
+        setUser(null);
+      }
     });
     void (async () => {
       const refreshed = await apiClient.refresh();
@@ -44,15 +49,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       active = false;
       unsubscribe();
     };
-  }, []);
+  }, [queryClient]);
 
   async function login(credentials: Credentials) {
     const account = await apiClient.login(credentials);
+    queryClient.clear();
     setUser(account);
   }
 
   async function logout() {
     await apiClient.logout();
+    queryClient.clear();
     setUser(null);
   }
 
