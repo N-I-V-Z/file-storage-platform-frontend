@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ApiError } from "@/src/lib/http/api-client";
 import { ApiKeyPanel } from "@/src/features/api-keys/components/api-key-panel";
+import { FileExplorer } from "@/src/features/files/components/file-explorer";
 import { createProject } from "../api/projects.api";
 import { projectKeys } from "../api/projects.keys";
 import { useProjects } from "../hooks/use-projects";
@@ -203,6 +204,11 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
             </p>
             <ProjectUsagePanel
               key={`usage-${selected.id}`}
+              userId={userId}
+              projectId={selected.id}
+            />
+            <FileExplorer
+              key={`files-${selected.id}`}
               userId={userId}
               projectId={selected.id}
             />

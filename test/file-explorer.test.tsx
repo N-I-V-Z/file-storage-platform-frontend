@@ -1,0 +1,133 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { FileExplorer } from "../src/features/files/components/file-explorer";
+import { listFiles } from "../src/features/files/api/files.api";
+
+vi.mock("../src/features/files/api/files.api", () => ({ listFiles: vi.fn() }));
+
+const projectId = "00000000-0000-4000-8000-000000000001";
+const otherId = "00000000-0000-4000-8000-000000000002";
+const file = {
+  id: "00000000-0000-4000-8000-000000000003",
+  projectId,
+  folderId: null,
+  originalName: "report.pdf",
+  contentType: "application/pdf" as const,
+  sizeBytes: "1536",
+  sha256: "a".repeat(64),
+  status: "ready" as const,
+  createdAt: "2026-11-20T00:00:00.000Z",
+};
+
+function setup(id = projectId) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  const view = render(
+    <QueryClientProvider client={client}>
+      <FileExplorer key={id} userId="user-a" projectId={id} />
+    </QueryClientProvider>,
+  );
+  return { ...view, client };
+}
+
+describe("FileExplorer", () => {
+  beforeEach(() => vi.mocked(listFiles).mockReset());
+  afterEach(cleanup);
+
+  it("keeps a loading region and shows file metadata after loading", async () => {
+    let resolve!: (value: Awaited<ReturnType<typeof listFiles>>) => void;
+    vi.mocked(listFiles).mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      }),
+    );
+    setup();
+    expect(screen.getByRole("status")).toHaveTextContent("Đang tải tệp");
+    resolve({ items: [file], page: 1, pageSize: 20, total: 1 });
+    expect(await screen.findByText("report.pdf")).toBeInTheDocument();
+    expect(screen.getByText("1,5 KiB")).toBeInTheDocument();
+    expect(screen.getByText("1 tệp")).toBeInTheDocument();
+  });
+
+  it("applies search/filter/sort and changes server pages", async () => {
+    vi.mocked(listFiles).mockImplementation(
+      async (_projectId, options = {}) => {
+        return {
+          items: options.page === 2 ? [] : [file],
+          page: options.page ?? 1,
+          pageSize: 20,
+          total: 21,
+        };
+      },
+    );
+    setup();
+    await screen.findByText("report.pdf");
+    fireEvent.change(screen.getByLabelText("Tìm tệp"), {
+      target: { value: "report" },
+    });
+    fireEvent.change(screen.getByLabelText("Loại tệp"), {
+      target: { value: "application/pdf" },
+    });
+    fireEvent.change(screen.getByLabelText("Sắp xếp"), {
+      target: { value: "size-desc" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Áp dụng" }));
+    await waitFor(() =>
+      expect(listFiles).toHaveBeenCalledWith(
+        projectId,
+        expect.objectContaining({
+          page: 1,
+          search: "report",
+          contentType: "application/pdf",
+          sort: "size-desc",
+        }),
+      ),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    await waitFor(() =>
+      expect(listFiles).toHaveBeenCalledWith(
+        projectId,
+        expect.objectContaining({ page: 2 }),
+      ),
+    );
+    expect(await screen.findByText("Trang 2 / 2")).toBeInTheDocument();
+  });
+
+  it("offers retry when listing fails and distinguishes empty results", async () => {
+    vi.mocked(listFiles)
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce({ items: [], page: 1, pageSize: 20, total: 0 });
+    setup();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Không thể tải tệp",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Thử tải tệp" }));
+    expect(await screen.findByText("Chưa có tệp nào")).toBeInTheDocument();
+  });
+
+  it("does not display the previous project's files after a switch", async () => {
+    vi.mocked(listFiles).mockImplementation(async (id) => ({
+      items: id === projectId ? [file] : [],
+      page: 1,
+      pageSize: 20,
+      total: id === projectId ? 1 : 0,
+    }));
+    const { rerender, client } = setup();
+    await screen.findByText("report.pdf");
+    rerender(
+      <QueryClientProvider client={client}>
+        <FileExplorer key={otherId} userId="user-a" projectId={otherId} />
+      </QueryClientProvider>,
+    );
+    expect(screen.queryByText("report.pdf")).not.toBeInTheDocument();
+    expect(await screen.findByText("Chưa có tệp nào")).toBeInTheDocument();
+  });
+});
