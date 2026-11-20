@@ -22,6 +22,9 @@ vi.mock("../src/features/projects/api/projects.api", () => ({
 vi.mock("../src/features/api-keys/components/api-key-panel", () => ({
   ApiKeyPanel: () => <div>API keys</div>,
 }));
+vi.mock("../src/features/files/components/file-explorer", () => ({
+  FileExplorer: () => <div>File Explorer</div>,
+}));
 
 const project = {
   id: "00000000-0000-4000-8000-000000000001",
