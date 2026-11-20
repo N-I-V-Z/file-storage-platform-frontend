@@ -963,6 +963,58 @@ button {
   margin: 10px 0 0;
   font-size: 12px;
 }
+.upload-panel {
+  margin-top: 20px;
+}
+.upload-panel > label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.upload-drop {
+  padding: 16px;
+  border: 1px dashed #aebed5;
+  border-radius: 9px;
+  background: #fbfcff;
+}
+.upload-drop[data-dragging="true"] {
+  border-color: var(--blue);
+  background: #eef3ff;
+}
+.upload-drop p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.upload-drop input {
+  max-width: 100%;
+  font-size: 12px;
+}
+.upload-tasks {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.upload-tasks li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 12px;
+}
+.upload-tasks strong {
+  overflow-wrap: anywhere;
+}
+.upload-tasks span {
+  margin-left: auto;
+  color: var(--muted);
+}
 .files-filters {
   display: grid;
   grid-template-columns:

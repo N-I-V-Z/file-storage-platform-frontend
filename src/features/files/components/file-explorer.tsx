@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { formatBytes } from "@/src/features/projects/usage-format";
 import { useFiles } from "../hooks/use-files";
 import { FolderNavigator } from "./folder-navigator";
+import { UploadPanel } from "./upload-panel";
 import {
   explorerFiltersSchema,
   fileListParamsSchema,
@@ -84,6 +85,12 @@ export function FileExplorer({
         onSelect={(folderId) =>
           setParams((current) => ({ ...current, folderId, page: 1 }))
         }
+      />
+
+      <UploadPanel
+        userId={userId}
+        projectId={projectId}
+        folderId={params.folderId}
       />
 
       <form

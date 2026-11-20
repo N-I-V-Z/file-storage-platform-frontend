@@ -165,6 +165,81 @@ export class ApiClient {
       throw new ApiError(response.status, errorMessage(response.status));
   }
 
+  private sendMultipart(
+    path: string,
+    body: FormData,
+    headers: Record<string, string>,
+    signal: AbortSignal,
+    onProgress: (loaded: number, total: number) => void,
+    token: string | null,
+  ): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const abort = () => xhr.abort();
+      xhr.open("POST", `${this.baseUrl}${path}`);
+      xhr.withCredentials = true;
+      if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      Object.entries(headers).forEach(([name, value]) =>
+        xhr.setRequestHeader(name, value),
+      );
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) onProgress(event.loaded, event.total);
+      };
+      xhr.onload = () => {
+        signal.removeEventListener("abort", abort);
+        resolve(new Response(xhr.responseText, { status: xhr.status }));
+      };
+      xhr.onerror = () => {
+        signal.removeEventListener("abort", abort);
+        reject(new ApiError(0, "Kết nối bị gián đoạn. Vui lòng thử lại."));
+      };
+      xhr.onabort = () => {
+        signal.removeEventListener("abort", abort);
+        reject(new DOMException("Đã hủy tải lên.", "AbortError"));
+      };
+      signal.addEventListener("abort", abort, { once: true });
+      if (signal.aborted) abort();
+      else xhr.send(body);
+    });
+  }
+
+  async upload<T>(
+    path: string,
+    body: FormData,
+    schema: z.ZodType<T>,
+    options: {
+      headers?: Record<string, string>;
+      signal: AbortSignal;
+      onProgress: (loaded: number, total: number) => void;
+    },
+  ): Promise<T> {
+    const token = this.accessToken;
+    let response = await this.sendMultipart(
+      path,
+      body,
+      options.headers ?? {},
+      options.signal,
+      options.onProgress,
+      token,
+    );
+    if (
+      response.status === 401 &&
+      token &&
+      !options.signal.aborted &&
+      (await this.refresh())
+    ) {
+      response = await this.sendMultipart(
+        path,
+        body,
+        options.headers ?? {},
+        options.signal,
+        options.onProgress,
+        this.accessToken,
+      );
+    }
+    return this.parse(response, schema);
+  }
+
   async me(): Promise<User> {
     return this.request("/auth/me", userSchema);
   }
