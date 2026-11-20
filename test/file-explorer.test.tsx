@@ -9,8 +9,15 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FileExplorer } from "../src/features/files/components/file-explorer";
 import { listFiles } from "../src/features/files/api/files.api";
+import { listFolders } from "../src/features/files/api/folders.api";
 
 vi.mock("../src/features/files/api/files.api", () => ({ listFiles: vi.fn() }));
+vi.mock("../src/features/files/api/folders.api", () => ({
+  listFolders: vi.fn(),
+  createFolder: vi.fn(),
+  renameFolder: vi.fn(),
+  deleteFolder: vi.fn(),
+}));
 
 const projectId = "00000000-0000-4000-8000-000000000001";
 const otherId = "00000000-0000-4000-8000-000000000002";
@@ -39,7 +46,10 @@ function setup(id = projectId) {
 }
 
 describe("FileExplorer", () => {
-  beforeEach(() => vi.mocked(listFiles).mockReset());
+  beforeEach(() => {
+    vi.mocked(listFiles).mockReset();
+    vi.mocked(listFolders).mockResolvedValue([]);
+  });
   afterEach(cleanup);
 
   it("keeps a loading region and shows file metadata after loading", async () => {
@@ -50,7 +60,7 @@ describe("FileExplorer", () => {
       }),
     );
     setup();
-    expect(screen.getByRole("status")).toHaveTextContent("Đang tải tệp");
+    expect(screen.getByText("Đang tải tệp...")).toBeInTheDocument();
     resolve({ items: [file], page: 1, pageSize: 20, total: 1 });
     expect(await screen.findByText("report.pdf")).toBeInTheDocument();
     expect(screen.getByText("1,5 KiB")).toBeInTheDocument();
@@ -99,6 +109,38 @@ describe("FileExplorer", () => {
       ),
     );
     expect(await screen.findByText("Trang 2 / 2")).toBeInTheDocument();
+  });
+
+  it("resets to page one when selecting a folder", async () => {
+    vi.mocked(listFolders).mockResolvedValue([
+      {
+        id: "00000000-0000-4000-8000-000000000004",
+        projectId,
+        name: "Media",
+        createdAt: "2026-11-20T00:00:00.000Z",
+        updatedAt: "2026-11-20T00:00:00.000Z",
+      },
+    ]);
+    vi.mocked(listFiles).mockImplementation(async (_id, options = {}) => ({
+      items: options.page === 2 ? [] : [file],
+      page: options.page ?? 1,
+      pageSize: 20,
+      total: 21,
+    }));
+    setup();
+    await screen.findByText("report.pdf");
+    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    await screen.findByText("Trang 2 / 2");
+    fireEvent.click(await screen.findByRole("button", { name: "Media" }));
+    await waitFor(() =>
+      expect(listFiles).toHaveBeenCalledWith(
+        projectId,
+        expect.objectContaining({
+          page: 1,
+          folderId: "00000000-0000-4000-8000-000000000004",
+        }),
+      ),
+    );
   });
 
   it("offers retry when listing fails and distinguishes empty results", async () => {

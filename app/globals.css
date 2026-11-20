@@ -893,6 +893,76 @@ button {
   color: var(--muted);
   font-size: 13px;
 }
+.folders-block {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fbfcff;
+}
+.folders-heading,
+.folder-form,
+.folder-confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.folders-heading {
+  justify-content: space-between;
+}
+.folders-heading h4 {
+  margin: 0;
+  font-size: 13px;
+}
+.folders-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+.folders-nav button {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #cbd6e5;
+  border-radius: 7px;
+  background: white;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 12px;
+}
+.folders-nav button[aria-current="page"] {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: #eef3ff;
+}
+.folder-entry {
+  display: inline-flex;
+  gap: 2px;
+}
+.folders-nav .folder-action {
+  color: var(--muted);
+  font-size: 11px;
+}
+.folder-form,
+.folder-confirm {
+  margin-top: 13px;
+}
+.folder-form input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #cbd6e5;
+  border-radius: 7px;
+}
+.folder-confirm p {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+}
+.folders-block > p {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
 .files-filters {
   display: grid;
   grid-template-columns:

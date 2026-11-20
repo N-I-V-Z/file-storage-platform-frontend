@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { formatBytes } from "@/src/features/projects/usage-format";
 import { useFiles } from "../hooks/use-files";
+import { FolderNavigator } from "./folder-navigator";
 import {
   explorerFiltersSchema,
   fileListParamsSchema,
@@ -75,6 +76,15 @@ export function FileExplorer({
         </div>
         {page ? <span className="files-count">{page.total} tệp</span> : null}
       </div>
+
+      <FolderNavigator
+        userId={userId}
+        projectId={projectId}
+        selectedId={params.folderId}
+        onSelect={(folderId) =>
+          setParams((current) => ({ ...current, folderId, page: 1 }))
+        }
+      />
 
       <form
         className="files-filters"
