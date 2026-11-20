@@ -46,28 +46,43 @@ export function DashboardHome() {
             file<span className="brand-muted">stack</span>
           </span>
         </Link>
-        <button
-          type="button"
-          className="button button-outline"
-          onClick={handleLogout}
-          disabled={signingOut}
-          aria-busy={signingOut}
-        >
-          {signingOut ? "Đang đăng xuất..." : "Đăng xuất"}
-        </button>
+        <div className="dashboard-header-actions">
+          <nav className="dashboard-nav" aria-label="Dashboard">
+            <a href="#projects">Projects</a>
+            <a href="#account">Tài khoản</a>
+          </nav>
+          <button
+            type="button"
+            className="button button-outline"
+            onClick={handleLogout}
+            disabled={signingOut}
+            aria-busy={signingOut}
+          >
+            {signingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+          </button>
+        </div>
       </header>
       <div className="dashboard-content">
         <span className="eyebrow">WORKSPACE / TỔNG QUAN</span>
         <h1>Chào mừng trở lại.</h1>
-        <p>
-          Bạn đang đăng nhập với <strong>{user.email}</strong>.
-        </p>
+        <p>Quản lý project, dung lượng lưu trữ và quyền truy cập tại đây.</p>
         {error && (
           <p className="form-error" role="alert">
             {error}
           </p>
         )}
         <ProjectWorkspace key={user.id} userId={user.id} />
+        <section
+          id="account"
+          className="account-panel"
+          aria-labelledby="account-heading"
+        >
+          <div>
+            <span className="eyebrow">PHIÊN ĐĂNG NHẬP</span>
+            <h2 id="account-heading">Tài khoản</h2>
+          </div>
+          <p>{user.email}</p>
+        </section>
       </div>
     </main>
   );

@@ -10,7 +10,11 @@
 
 ## Navigation and loading
 
-`/dashboard` checks the cookie session before showing account or project data. The project list belongs to the signed-in user and loads through TanStack Query. Selection is local to this page: choose the first project when data arrives, select a newly created project, and choose another existing project if the selected one disappears. Show distinct loading, empty, and recoverable error states; a failed fetch has a visible retry action. The project list and selected project's key list use separate query keys.
+`/dashboard` checks the cookie session before showing account or project data. Its header links to the Projects and Tài khoản sections; the account section displays the signed-in email. The route shows a loading message during navigation and a generic error with a retry button if rendering fails. The project list belongs to the signed-in user and loads through TanStack Query. Selection is local to this page: choose the first project when data arrives, select a newly created project, and choose another existing project if the selected one disappears. Show distinct loading, empty, and recoverable error states; a failed fetch has a visible retry action. The project list, selected project's usage, and key list use separate query keys.
+
+## Storage usage
+
+The selected project's usage card loads `GET /projects/:id/usage` after session restoration. It shows used bytes against quota, a percentage bar, and bytes reserved by uploads. Balance fields are decimal strings; validate them before `BigInt` arithmetic and format binary units for display. Loading and failed requests remain inside the card so project selection and API keys stay usable. A failed request offers retry. Switching projects clears the prior card immediately; never display one project's usage under another project's name.
 
 ## Forms and mutations
 

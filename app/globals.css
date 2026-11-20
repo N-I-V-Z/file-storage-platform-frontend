@@ -505,6 +505,88 @@ button {
   place-items: center;
   color: var(--muted);
 }
+.dashboard-header-actions,
+.dashboard-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.dashboard-nav a {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.dashboard-nav a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.account-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+}
+.account-panel h2 {
+  margin: 6px 0 0;
+  font-size: 20px;
+  letter-spacing: -0.035em;
+}
+.account-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.dashboard-error {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.dashboard-error-card {
+  width: min(100%, 460px);
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+}
+.dashboard-error-card h1 {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.04em;
+}
+.dashboard-error-card p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+@media (max-width: 620px) {
+  .dashboard-shell .site-header {
+    align-items: start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 0;
+  }
+  .dashboard-header-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .dashboard-nav {
+    flex-wrap: wrap;
+    gap: 8px 15px;
+  }
+  .dashboard-header-actions .button {
+    min-height: 40px;
+    padding: 0 12px;
+  }
+}
 @media (max-width: 850px) {
   .hero {
     gap: 35px;
@@ -745,6 +827,50 @@ button {
   margin: 9px 0 26px;
   color: var(--muted);
   font-size: 14px;
+}
+.usage-section {
+  padding: 23px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f9fbff;
+}
+.usage-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.usage-heading h3 {
+  margin: 5px 0 0;
+  font-size: 19px;
+  letter-spacing: -0.035em;
+}
+.usage-ratio {
+  font-size: 14px;
+  font-weight: 700;
+}
+.usage-meter {
+  height: 9px;
+  margin-top: 19px;
+  overflow: hidden;
+  border-radius: 100px;
+  background: #dce5f4;
+}
+.usage-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+}
+.usage-reserved,
+.usage-message {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.usage-message p {
+  margin: 0 0 8px;
 }
 .key-placeholder {
   display: flex;
