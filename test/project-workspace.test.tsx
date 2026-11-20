@@ -147,4 +147,16 @@ describe("ProjectWorkspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Thử tải dung lượng" }));
     expect(await screen.findByText("0 B / 10 GiB")).toBeInTheDocument();
   });
+
+  it("keeps project controls visible while usage loads", async () => {
+    vi.mocked(listProjects).mockResolvedValue([project]);
+    vi.mocked(getProjectUsage).mockReturnValue(new Promise(() => {}));
+    setup();
+    expect(await screen.findByText("Đang tải dung lượng...")).toHaveAttribute(
+      "role",
+      "status",
+    );
+    expect(screen.getByRole("heading", { name: "Media" })).toBeInTheDocument();
+    expect(screen.getByText("API keys")).toBeInTheDocument();
+  });
 });
