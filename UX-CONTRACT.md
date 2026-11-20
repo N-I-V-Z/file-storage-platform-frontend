@@ -6,7 +6,7 @@
 | --- | --- | --- | --- | --- |
 | Select/Listbox | Native HTML `select` | This contract and `DESIGN.md` | Native for fixed expiry choices; browser popup and locale behavior accepted | API key panel component test and manual keyboard smoke test |
 | Form | Zod schema with React Hook Form | This contract and feature schemas | Project creation and key issuance | Project and API key component tests |
-| CRUD | Project/API key feature modules | This contract and backend API contract | Stay on dashboard after create and revoke | Project and API key component tests |
+| CRUD | Project/API key/file feature modules | This contract and backend API contract | Stay on dashboard after create, revoke, and folder changes | Project, API key, and file component tests |
 
 ## Navigation and loading
 
@@ -15,6 +15,14 @@
 ## Storage usage
 
 The selected project's usage card loads `GET /projects/:id/usage` after session restoration. It shows used bytes against quota, a percentage bar, and bytes reserved by uploads. Balance fields are decimal strings; validate them before `BigInt` arithmetic and format binary units for display. Loading and failed requests remain inside the card so project selection and API keys stay usable. A failed request offers retry. Switching projects clears the prior card immediately; never display one project's usage under another project's name.
+
+## File explorer and transport
+
+The selected project shows only READY files from the private owner API. Search, MIME filter, sort, folder selection, and pagination are server backed; changing filters or folders returns to page one. Folder choices are all files, unfiled root, and flat project folders. Create and rename use Zod with React Hook Form; deleting a folder requires inline confirmation, and a nonempty folder reports the conflict without losing the retry action. Switching projects clears the previous project's file and folder view.
+
+The upload area accepts multiple selected or dropped files. It checks size, MIME, and filename locally, then sends one multipart request per file directly to NestJS with the in-memory Bearer token. At most two uploads run concurrently; the rest remain queued and can be canceled. Each file has progress, cancellation, and retry; only a READY response marks success and refreshes file list and usage. The selected folder is sent as `X-Folder-Id`, while all/root upload to the unfiled project root. Never place tokens in URLs or browser storage.
+
+Preview supports PNG, JPEG, WebP, PDF, and MP4 up to 64 MiB. Video preview fetches authenticated byte ranges into a temporary Blob URL; seeking after loading is local and makes no new server Range request. ZIP and larger files offer download only. Download fetches the private endpoint with Bearer auth and checks MIME and complete byte count. Browsers with the File System Access API write the response stream directly to the chosen file. Other browsers use a Blob only up to 64 MiB and explain the limitation for larger files. Preview URLs are revoked on close; a failed or unauthorized response is never shown as media.
 
 ## Forms and mutations
 
