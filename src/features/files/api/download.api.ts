@@ -36,6 +36,76 @@ function assertResponse(
   }
 }
 
+type WritableFile = {
+  write(chunk: Uint8Array): Promise<void>;
+  close(): Promise<void>;
+  abort(): Promise<void>;
+};
+type FilePickerWindow = Window & {
+  showSaveFilePicker?: (options: { suggestedName: string }) => Promise<{
+    createWritable(): Promise<WritableFile>;
+  }>;
+};
+
+export async function saveDownload(
+  projectId: string,
+  file: StoredFile,
+  signal: AbortSignal,
+  client: ApiClient = apiClient,
+) {
+  if (file.projectId !== projectId)
+    throw new ApiError(502, "Tệp không thuộc project đang chọn.");
+  const picker = (window as FilePickerWindow).showSaveFilePicker;
+  if (picker) {
+    // The picker must open in the user's click gesture, before network awaits.
+    const handle = await picker.call(window, {
+      suggestedName: file.originalName,
+    });
+    const writer = await handle.createWritable();
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    try {
+      const response = await client.requestBinary(path(projectId, file.id), {
+        signal,
+      });
+      assertResponse(response, file, 200);
+      if (!response.body)
+        throw new ApiError(502, "Máy chủ không trả luồng tệp.");
+      reader = response.body.getReader();
+      let received = BigInt(0);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        received += BigInt(value.byteLength);
+        if (received > BigInt(file.sizeBytes))
+          throw new ApiError(502, "Tệp tải về không hợp lệ.");
+        await writer.write(value);
+      }
+      if (received !== BigInt(file.sizeBytes))
+        throw new ApiError(502, "Tệp tải về không đầy đủ.");
+      await writer.close();
+      return;
+    } catch (error) {
+      await reader?.cancel().catch(() => undefined);
+      await writer.abort().catch(() => undefined);
+      throw error;
+    }
+  }
+  if (BigInt(file.sizeBytes) > BigInt(MAX_PREVIEW_BYTES)) {
+    throw new Error(
+      "Trình duyệt này cần hỗ trợ lưu tệp theo luồng để tải tệp trên 64 MiB.",
+    );
+  }
+  const blob = await fetchDownload(projectId, file, signal, client);
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = file.originalName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 export async function fetchDownload(
   projectId: string,
   file: StoredFile,

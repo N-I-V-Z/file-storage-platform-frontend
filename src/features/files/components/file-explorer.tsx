@@ -8,7 +8,7 @@ import { useFiles } from "../hooks/use-files";
 import { FolderNavigator } from "./folder-navigator";
 import { UploadPanel } from "./upload-panel";
 import { FilePreview } from "./file-preview";
-import { canPreview, fetchDownload } from "../api/download.api";
+import { canPreview, saveDownload } from "../api/download.api";
 import type { StoredFile } from "../schemas/files.schemas";
 import {
   explorerFiltersSchema,
@@ -80,19 +80,13 @@ export function FileExplorer({
     setDownloadError("");
     setDownloadingId(file.id);
     try {
-      const blob = await fetchDownload(projectId, file, controller.signal);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = file.originalName;
-      document.body.append(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      await saveDownload(projectId, file, controller.signal);
     } catch (error) {
-      setDownloadError(
-        error instanceof Error ? error.message : "Không thể tải tệp.",
-      );
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
+        setDownloadError(
+          error instanceof Error ? error.message : "Không thể tải tệp.",
+        );
+      }
     } finally {
       setDownloadingId(null);
     }

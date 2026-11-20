@@ -127,4 +127,57 @@ describe("UploadPanel", () => {
     await waitFor(() => expect(abort).toHaveBeenCalledOnce());
     expect(await screen.findByText("Đã hủy tải lên.")).toBeInTheDocument();
   });
+
+  it("queues uploads above two active requests", async () => {
+    const resolvers: Array<
+      (value: Awaited<ReturnType<typeof uploadFile>>) => void
+    > = [];
+    vi.mocked(uploadFile).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolvers.push(resolve);
+        }),
+    );
+    setup();
+    const files = [1, 2, 3].map(
+      (number) =>
+        new File(["%PDF-1.7"], `note-${number}.pdf`, {
+          type: "application/pdf",
+        }),
+    );
+    fireEvent.change(screen.getByLabelText(/Tải tệp vào/), {
+      target: { files },
+    });
+    expect(uploadFile).toHaveBeenCalledTimes(2);
+    expect(screen.getByText("Đang chờ")).toBeInTheDocument();
+    resolvers[0]({
+      id: "00000000-0000-4000-8000-000000000003",
+      projectId,
+      folderId,
+      originalName: "note-1.pdf",
+      contentType: "application/pdf",
+      sizeBytes: 8,
+      sha256: "a".repeat(64),
+      status: "ready",
+      createdAt: "2026-11-20T00:00:00.000Z",
+    });
+    await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(3));
+  });
+
+  it("can cancel a queued file before any request starts", async () => {
+    vi.mocked(uploadFile).mockImplementation(() => new Promise(() => {}));
+    setup();
+    const files = [1, 2, 3].map(
+      (number) =>
+        new File(["%PDF-1.7"], `note-${number}.pdf`, {
+          type: "application/pdf",
+        }),
+    );
+    fireEvent.change(screen.getByLabelText(/Tải tệp vào/), {
+      target: { files },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Hủy note-3.pdf" }));
+    expect(screen.getByText("Đã hủy tải lên.")).toBeInTheDocument();
+    expect(uploadFile).toHaveBeenCalledTimes(2);
+  });
 });

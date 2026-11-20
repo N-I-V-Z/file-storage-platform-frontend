@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiClient } from "../src/lib/http/api-client";
 import {
   canPreview,
   fetchDownload,
   fetchPreview,
+  saveDownload,
 } from "../src/features/files/api/download.api";
 import type { StoredFile } from "../src/features/files/schemas/files.schemas";
 
@@ -22,6 +23,7 @@ const file: StoredFile = {
 const signal = new AbortController().signal;
 
 describe("private file transport", () => {
+  afterEach(() => vi.unstubAllGlobals());
   it("sends Bearer auth for binary download and checks the complete response", async () => {
     const fetcher = vi.fn(
       async (_input: RequestInfo | URL, init?: RequestInit) => {
@@ -98,5 +100,65 @@ describe("private file transport", () => {
     await expect(
       fetchDownload(projectId, file, signal, client),
     ).rejects.toMatchObject({ status: 403 });
+  });
+
+  it("streams a download into the browser file writer", async () => {
+    const writer = {
+      write: vi.fn(async () => {}),
+      close: vi.fn(async () => {}),
+      abort: vi.fn(async () => {}),
+    };
+    const picker = vi.fn(async () => ({ createWritable: async () => writer }));
+    vi.stubGlobal("showSaveFilePicker", picker);
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      vi.fn(
+        async () =>
+          new Response("DATA", {
+            status: 200,
+            headers: { "Content-Type": "video/mp4" },
+          }),
+      ) as typeof fetch,
+    );
+    await saveDownload(projectId, file, signal, client);
+    expect(picker).toHaveBeenCalledWith({ suggestedName: "clip.mp4" });
+    expect(writer.write).toHaveBeenCalledOnce();
+    expect(writer.close).toHaveBeenCalledOnce();
+    expect(writer.abort).not.toHaveBeenCalled();
+  });
+
+  it("aborts an incomplete file and caps the Blob fallback", async () => {
+    const writer = {
+      write: vi.fn(async () => {}),
+      close: vi.fn(async () => {}),
+      abort: vi.fn(async () => {}),
+    };
+    vi.stubGlobal(
+      "showSaveFilePicker",
+      vi.fn(async () => ({ createWritable: async () => writer })),
+    );
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      vi.fn(
+        async () =>
+          new Response("BAD", {
+            status: 200,
+            headers: { "Content-Type": "video/mp4" },
+          }),
+      ) as typeof fetch,
+    );
+    await expect(
+      saveDownload(projectId, file, signal, client),
+    ).rejects.toMatchObject({ status: 502 });
+    expect(writer.abort).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+    await expect(
+      saveDownload(
+        projectId,
+        { ...file, sizeBytes: String(65 * 1024 * 1024) },
+        signal,
+        client,
+      ),
+    ).rejects.toThrow(/64 MiB/);
   });
 });
