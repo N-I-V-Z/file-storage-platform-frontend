@@ -165,6 +165,14 @@ export class ApiClient {
       throw new ApiError(response.status, errorMessage(response.status));
   }
 
+  async requestBinary(path: string, init: RequestInit = {}): Promise<Response> {
+    const response = await this.sendAuthenticated(path, init);
+    if (!response.ok) {
+      throw new ApiError(response.status, errorMessage(response.status));
+    }
+    return response;
+  }
+
   private sendMultipart(
     path: string,
     body: FormData,

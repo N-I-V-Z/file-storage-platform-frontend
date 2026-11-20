@@ -1111,10 +1111,46 @@ button {
   font-size: 11px;
 }
 .files-item-size {
-  margin-left: auto;
   color: var(--muted);
   font-size: 12px;
   white-space: nowrap;
+}
+.files-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-left: auto;
+}
+.files-preview-note {
+  color: var(--muted);
+  font-size: 11px;
+}
+.file-preview {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+}
+.file-preview-heading {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+.file-preview img,
+.file-preview video,
+.file-preview iframe {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  border: 0;
+  object-fit: contain;
+}
+.file-preview iframe {
+  min-height: 480px;
 }
 .files-pagination {
   display: flex;

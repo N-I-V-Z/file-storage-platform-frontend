@@ -7,6 +7,9 @@ import { formatBytes } from "@/src/features/projects/usage-format";
 import { useFiles } from "../hooks/use-files";
 import { FolderNavigator } from "./folder-navigator";
 import { UploadPanel } from "./upload-panel";
+import { FilePreview } from "./file-preview";
+import { canPreview, fetchDownload } from "../api/download.api";
+import type { StoredFile } from "../schemas/files.schemas";
 import {
   explorerFiltersSchema,
   fileListParamsSchema,
@@ -43,6 +46,9 @@ export function FileExplorer({
   const [params, setParams] = useState<FileListParams>(() =>
     fileListParamsSchema.parse({}),
   );
+  const [previewFile, setPreviewFile] = useState<StoredFile | null>(null);
+  const [downloadError, setDownloadError] = useState("");
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const filesQuery = useFiles(userId, projectId, params);
   const {
     register,
@@ -58,6 +64,7 @@ export function FileExplorer({
     : 1;
 
   function applyFilters(values: ExplorerFilters) {
+    setPreviewFile(null);
     setParams((current) => ({
       ...current,
       page: 1,
@@ -66,6 +73,29 @@ export function FileExplorer({
         values.contentType === "all" ? undefined : values.contentType,
       sort: values.sort,
     }));
+  }
+
+  async function download(file: StoredFile) {
+    const controller = new AbortController();
+    setDownloadError("");
+    setDownloadingId(file.id);
+    try {
+      const blob = await fetchDownload(projectId, file, controller.signal);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.originalName;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (error) {
+      setDownloadError(
+        error instanceof Error ? error.message : "Không thể tải tệp.",
+      );
+    } finally {
+      setDownloadingId(null);
+    }
   }
 
   return (
@@ -82,9 +112,10 @@ export function FileExplorer({
         userId={userId}
         projectId={projectId}
         selectedId={params.folderId}
-        onSelect={(folderId) =>
-          setParams((current) => ({ ...current, folderId, page: 1 }))
-        }
+        onSelect={(folderId) => {
+          setPreviewFile(null);
+          setParams((current) => ({ ...current, folderId, page: 1 }));
+        }}
       />
 
       <UploadPanel
@@ -178,11 +209,49 @@ export function FileExplorer({
                 <span className="files-item-size">
                   {formatBytes(BigInt(file.sizeBytes))}
                 </span>
+                <div className="files-item-actions">
+                  {canPreview(file) ? (
+                    <button
+                      type="button"
+                      className="text-action"
+                      onClick={() => setPreviewFile(file)}
+                    >
+                      Xem {file.originalName}
+                    </button>
+                  ) : null}
+                  {file.contentType === "video/mp4" && !canPreview(file) ? (
+                    <span className="files-preview-note">
+                      Xem trước tối đa 64 MiB
+                    </span>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="text-action"
+                    disabled={downloadingId === file.id}
+                    onClick={() => void download(file)}
+                  >
+                    Tải {file.originalName}
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         ) : null}
       </div>
+
+      {downloadError ? (
+        <p role="alert" className="form-error">
+          {downloadError}
+        </p>
+      ) : null}
+      {previewFile ? (
+        <FilePreview
+          key={previewFile.id}
+          projectId={projectId}
+          file={previewFile}
+          onClose={() => setPreviewFile(null)}
+        />
+      ) : null}
 
       {page && page.total > params.pageSize ? (
         <div className="files-pagination" aria-label="Phân trang tệp">
