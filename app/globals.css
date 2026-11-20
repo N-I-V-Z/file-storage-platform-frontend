@@ -746,6 +746,50 @@ button {
   color: var(--muted);
   font-size: 14px;
 }
+.usage-section {
+  padding: 23px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f9fbff;
+}
+.usage-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.usage-heading h3 {
+  margin: 5px 0 0;
+  font-size: 19px;
+  letter-spacing: -0.035em;
+}
+.usage-ratio {
+  font-size: 14px;
+  font-weight: 700;
+}
+.usage-meter {
+  height: 9px;
+  margin-top: 19px;
+  overflow: hidden;
+  border-radius: 100px;
+  background: #dce5f4;
+}
+.usage-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+}
+.usage-reserved,
+.usage-message {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.usage-message p {
+  margin: 0 0 8px;
+}
 .key-placeholder {
   display: flex;
   align-items: center;
