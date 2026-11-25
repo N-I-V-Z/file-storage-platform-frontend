@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FileExplorer } from "../src/features/files/components/file-explorer";
 import { listFiles } from "../src/features/files/api/files.api";
 import { listFolders } from "../src/features/files/api/folders.api";
+import { moveToTrash } from "../src/features/files/api/trash.api";
 
 vi.mock("../src/features/files/api/files.api", () => ({ listFiles: vi.fn() }));
 vi.mock("../src/features/files/api/folders.api", () => ({
@@ -17,6 +18,9 @@ vi.mock("../src/features/files/api/folders.api", () => ({
   createFolder: vi.fn(),
   renameFolder: vi.fn(),
   deleteFolder: vi.fn(),
+}));
+vi.mock("../src/features/files/api/trash.api", () => ({
+  moveToTrash: vi.fn(),
 }));
 
 const projectId = "00000000-0000-4000-8000-000000000001";
@@ -49,6 +53,7 @@ describe("FileExplorer", () => {
   beforeEach(() => {
     vi.mocked(listFiles).mockReset();
     vi.mocked(listFolders).mockResolvedValue([]);
+    vi.mocked(moveToTrash).mockReset();
   });
   afterEach(cleanup);
 
@@ -170,6 +175,31 @@ describe("FileExplorer", () => {
       </QueryClientProvider>,
     );
     expect(screen.queryByText("report.pdf")).not.toBeInTheDocument();
+    expect(await screen.findByText("Chưa có tệp nào")).toBeInTheDocument();
+  });
+
+  it("requires inline confirmation before moving a file to trash and refreshes the list", async () => {
+    vi.mocked(listFiles)
+      .mockResolvedValueOnce({ items: [file], page: 1, pageSize: 20, total: 1 })
+      .mockResolvedValue({ items: [], page: 1, pageSize: 20, total: 0 });
+    vi.mocked(moveToTrash).mockResolvedValue();
+    setup();
+    await screen.findByText("report.pdf");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Chuyển report.pdf vào thùng rác" }),
+    );
+    expect(moveToTrash).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    expect(moveToTrash).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Chuyển report.pdf vào thùng rác" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Chuyển vào thùng rác" }),
+    );
+    await waitFor(() =>
+      expect(moveToTrash).toHaveBeenCalledWith(projectId, file.id),
+    );
     expect(await screen.findByText("Chưa có tệp nào")).toBeInTheDocument();
   });
 });

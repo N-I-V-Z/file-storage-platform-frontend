@@ -2,8 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { ApiError } from "@/src/lib/http/api-client";
 import { formatBytes } from "@/src/features/projects/usage-format";
+import { projectKeys } from "@/src/features/projects/api/projects.keys";
+import { moveToTrash } from "../api/trash.api";
+import { trashKeys } from "../api/trash.keys";
 import { useFiles } from "../hooks/use-files";
 import { FolderNavigator } from "./folder-navigator";
 import { UploadPanel } from "./upload-panel";
@@ -43,6 +48,9 @@ export function FileExplorer({
   userId: string;
   projectId: string;
 }) {
+  const queryClient = useQueryClient();
+  const [confirmTrashId, setConfirmTrashId] = useState<string | null>(null);
+  const [trashError, setTrashError] = useState("");
   const [params, setParams] = useState<FileListParams>(() =>
     fileListParamsSchema.parse({}),
   );
@@ -50,6 +58,9 @@ export function FileExplorer({
   const [downloadError, setDownloadError] = useState("");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const filesQuery = useFiles(userId, projectId, params);
+  const trashMutation = useMutation({
+    mutationFn: (fileId: string) => moveToTrash(projectId, fileId),
+  });
   const {
     register,
     handleSubmit,
@@ -89,6 +100,32 @@ export function FileExplorer({
       }
     } finally {
       setDownloadingId(null);
+    }
+  }
+
+  async function trash(fileId: string) {
+    setTrashError("");
+    try {
+      await trashMutation.mutateAsync(fileId);
+      setConfirmTrashId(null);
+      setPreviewFile(null);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["files", "list", userId, projectId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: trashKeys.project(userId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.usage(userId, projectId),
+        }),
+      ]);
+    } catch (error) {
+      setTrashError(
+        error instanceof ApiError
+          ? error.message
+          : "Không thể chuyển tệp vào thùng rác. Vui lòng thử lại.",
+      );
     }
   }
 
@@ -226,7 +263,52 @@ export function FileExplorer({
                   >
                     Tải {file.originalName}
                   </button>
+                  <button
+                    type="button"
+                    className="text-action"
+                    aria-label={`Chuyển ${file.originalName} vào thùng rác`}
+                    aria-expanded={confirmTrashId === file.id}
+                    disabled={trashMutation.isPending}
+                    onClick={() => {
+                      setTrashError("");
+                      setConfirmTrashId(file.id);
+                    }}
+                  >
+                    Chuyển vào thùng rác
+                  </button>
                 </div>
+                {confirmTrashId === file.id ? (
+                  <div className="files-inline-confirm">
+                    <p>
+                      Chuyển {file.originalName} vào thùng rác? Tệp vẫn tính vào
+                      dung lượng và sẽ bị xóa vĩnh viễn sau 30 ngày.
+                    </p>
+                    <button
+                      type="button"
+                      className="button button-outline"
+                      disabled={trashMutation.isPending}
+                      onClick={() => {
+                        setConfirmTrashId(null);
+                        setTrashError("");
+                      }}
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="button"
+                      className="button button-danger"
+                      disabled={trashMutation.isPending}
+                      onClick={() => void trash(file.id)}
+                    >
+                      Chuyển vào thùng rác
+                    </button>
+                    {trashError ? (
+                      <p role="alert" className="form-error">
+                        {trashError}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
