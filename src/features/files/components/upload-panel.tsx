@@ -46,6 +46,7 @@ export function UploadPanel({
   const controllers = useRef(new Map<number, AbortController>());
   const queue = useRef<PendingUpload[]>([]);
   const activeCount = useRef(0);
+  const usageRefreshTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -55,6 +56,8 @@ export function UploadPanel({
       queue.current = [];
       active.forEach((controller) => controller.abort());
       active.clear();
+      if (usageRefreshTimer.current) clearInterval(usageRefreshTimer.current);
+      usageRefreshTimer.current = null;
     };
   }, []);
 
@@ -63,6 +66,18 @@ export function UploadPanel({
     setTasks((current) =>
       current.map((task) => (task.id === id ? { ...task, ...patch } : task)),
     );
+  }
+
+  function refreshUsage() {
+    void queryClient.invalidateQueries({
+      queryKey: projectKeys.usage(userId, projectId),
+    });
+  }
+
+  function startUsageRefresh() {
+    if (usageRefreshTimer.current) return;
+    refreshUsage();
+    usageRefreshTimer.current = setInterval(refreshUsage, 2_000);
   }
 
   function pump() {
@@ -82,6 +97,7 @@ export function UploadPanel({
     const controller = new AbortController();
     controllers.current.set(id, controller);
     update(id, { state: "uploading", progress: 0, message: undefined });
+    startUsageRefresh();
     try {
       await uploadFile(
         projectId,
@@ -111,7 +127,12 @@ export function UploadPanel({
     } finally {
       controllers.current.delete(id);
       activeCount.current -= 1;
+      refreshUsage();
       pump();
+      if (activeCount.current === 0 && usageRefreshTimer.current) {
+        clearInterval(usageRefreshTimer.current);
+        usageRefreshTimer.current = null;
+      }
     }
   }
 

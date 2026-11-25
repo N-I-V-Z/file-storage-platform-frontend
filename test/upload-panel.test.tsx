@@ -6,6 +6,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UploadPanel } from "../src/features/files/components/upload-panel";
 import { uploadFile } from "../src/features/files/api/upload.api";
@@ -40,7 +41,48 @@ describe("UploadPanel", () => {
   beforeEach(() => {
     vi.mocked(uploadFile).mockReset();
   });
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
+
+  it("refreshes usage while an upload is active and after cancellation", async () => {
+    vi.mocked(uploadFile).mockImplementation(
+      (_id, _file, _folder, signal) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener("abort", () =>
+            reject(new DOMException("aborted", "AbortError")),
+          );
+        }),
+    );
+    const invalidate = setup();
+    vi.useFakeTimers();
+    fireEvent.change(screen.getByLabelText(/Tải tệp vào/), {
+      target: { files: [sample] },
+    });
+    const usageKey = ["projects", "usage", "user-a", projectId];
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: usageKey });
+    const beforeTick = invalidate.mock.calls.length;
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2_000);
+    });
+    expect(invalidate.mock.calls.length).toBeGreaterThan(beforeTick);
+    fireEvent.click(screen.getByRole("button", { name: "Hủy note.pdf" }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(
+      invalidate.mock.calls.filter(
+        ([options]) =>
+          JSON.stringify(options?.queryKey) === JSON.stringify(usageKey),
+      ).length,
+    ).toBeGreaterThanOrEqual(3);
+    const afterCancel = invalidate.mock.calls.length;
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2_000);
+    });
+    expect(invalidate.mock.calls.length).toBe(afterCancel);
+  });
 
   it("accepts several files, reports progress, and refreshes file/usage queries", async () => {
     vi.mocked(uploadFile).mockImplementation(
