@@ -7,6 +7,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError } from "../src/lib/http/api-client";
 import { TrashPanel } from "../src/features/files/components/trash-panel";
 import {
   listTrash,
@@ -92,5 +93,23 @@ describe("TrashPanel", () => {
       "Không thể xóa vĩnh viễn",
     );
     expect(screen.getByText("report.pdf")).toBeInTheDocument();
+  });
+  it("refreshes a purge claimed for background retry after a 503 response", async () => {
+    vi.mocked(listTrash)
+      .mockResolvedValueOnce({ items: [item], page: 1, pageSize: 20, total: 1 })
+      .mockResolvedValue({ items: [], page: 1, pageSize: 20, total: 0 });
+    vi.mocked(purgeTrash).mockRejectedValue(
+      new ApiError(503, "Máy chủ đang gặp sự cố."),
+    );
+    setup();
+    await screen.findByText("report.pdf");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Xóa vĩnh viễn report.pdf" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Xóa vĩnh viễn" }));
+    expect(await screen.findByText("Thùng rác trống")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Hệ thống sẽ tự thử lại",
+    );
   });
 });

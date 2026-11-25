@@ -202,4 +202,32 @@ describe("FileExplorer", () => {
     );
     expect(await screen.findByText("Chưa có tệp nào")).toBeInTheDocument();
   });
+  it("returns to page one after trashing the only file on the last page", async () => {
+    vi.mocked(listFiles).mockImplementation(async (_id, options = {}) => {
+      const moved = vi.mocked(moveToTrash).mock.calls.length > 0;
+      return {
+        items: options.page === 2 && !moved ? [file] : [],
+        page: options.page ?? 1,
+        pageSize: 20,
+        total: moved ? 20 : 21,
+      };
+    });
+    vi.mocked(moveToTrash).mockResolvedValue();
+    setup();
+    await screen.findByText("Trang 1 / 2");
+    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    await screen.findByText("report.pdf");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Chuyển report.pdf vào thùng rác" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Chuyển vào thùng rác" }),
+    );
+    await waitFor(() =>
+      expect(listFiles).toHaveBeenLastCalledWith(
+        projectId,
+        expect.objectContaining({ page: 1 }),
+      ),
+    );
+  });
 });

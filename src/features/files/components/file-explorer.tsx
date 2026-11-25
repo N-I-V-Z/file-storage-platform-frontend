@@ -109,6 +109,13 @@ export function FileExplorer({
       await trashMutation.mutateAsync(fileId);
       setConfirmTrashId(null);
       setPreviewFile(null);
+      if (
+        params.page > 1 &&
+        page &&
+        page.total <= (params.page - 1) * params.pageSize + 1
+      ) {
+        setParams((current) => ({ ...current, page: current.page - 1 }));
+      }
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["files", "list", userId, projectId],

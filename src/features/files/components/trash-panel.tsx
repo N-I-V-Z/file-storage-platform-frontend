@@ -58,6 +58,17 @@ export function TrashPanel({
       await refresh();
     } catch (error) {
       if (
+        kind === "purge" &&
+        error instanceof ApiError &&
+        error.status === 503
+      ) {
+        await refresh();
+        setActionError(
+          "Đã nhận yêu cầu xóa. Hệ thống sẽ tự thử lại; dung lượng được cập nhật sau khi xóa xong.",
+        );
+        return;
+      }
+      if (
         kind === "restore" &&
         error instanceof ApiError &&
         error.status === 409
