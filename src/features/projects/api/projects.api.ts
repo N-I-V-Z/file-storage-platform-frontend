@@ -3,6 +3,7 @@ import {
   createProjectSchema,
   projectSchema,
   projectUsageSchema,
+  projectUsageBreakdownSchema,
   projectsSchema,
   type CreateProjectValues,
 } from "../schemas/projects.schemas";
@@ -23,6 +24,20 @@ export async function getProjectUsage(
     throw new ApiError(502, "Máy chủ trả dữ liệu không hợp lệ.");
   }
   return usage;
+}
+
+export async function getProjectUsageBreakdown(
+  projectId: string,
+  client: ApiClient = apiClient,
+) {
+  const breakdown = await client.request(
+    `/projects/${projectId}/usage/breakdown`,
+    projectUsageBreakdownSchema,
+  );
+  if (breakdown.projectId !== projectId) {
+    throw new ApiError(502, "Máy chủ trả dữ liệu không hợp lệ.");
+  }
+  return breakdown;
 }
 
 export function createProject(

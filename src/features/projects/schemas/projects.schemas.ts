@@ -26,6 +26,27 @@ export const projectUsageSchema = z
       BigInt(usedBytes) + BigInt(reservedBytes) <= BigInt(quotaBytes),
   );
 
+export const projectUsageBreakdownSchema = projectUsageSchema
+  .safeExtend({
+    readyBytes: byteCountSchema,
+    trashBytes: byteCountSchema,
+    pendingBytes: byteCountSchema,
+    matchesBalance: z.boolean(),
+  })
+  .refine(
+    ({
+      readyBytes,
+      trashBytes,
+      pendingBytes,
+      usedBytes,
+      reservedBytes,
+      matchesBalance,
+    }) =>
+      !matchesBalance ||
+      (BigInt(readyBytes) + BigInt(trashBytes) === BigInt(usedBytes) &&
+        BigInt(pendingBytes) === BigInt(reservedBytes)),
+  );
+
 export const createProjectSchema = z.object({
   name: z
     .string()
@@ -36,4 +57,5 @@ export const createProjectSchema = z.object({
 
 export type Project = z.infer<typeof projectSchema>;
 export type ProjectUsage = z.infer<typeof projectUsageSchema>;
+export type ProjectUsageBreakdown = z.infer<typeof projectUsageBreakdownSchema>;
 export type CreateProjectValues = z.infer<typeof createProjectSchema>;
