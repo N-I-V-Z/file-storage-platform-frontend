@@ -1,6 +1,7 @@
 "use client";
 
 import { useProjectUsage } from "../hooks/use-project-usage";
+import { useProjectUsageBreakdown } from "../hooks/use-project-usage-breakdown";
 import { formatBytes, usagePercent } from "../usage-format";
 
 export function ProjectUsagePanel({
@@ -11,6 +12,7 @@ export function ProjectUsagePanel({
   projectId: string;
 }) {
   const usageQuery = useProjectUsage(userId, projectId);
+  const breakdownQuery = useProjectUsageBreakdown(userId, projectId);
   const usage = usageQuery.data;
 
   return (
@@ -68,6 +70,53 @@ export function ProjectUsagePanel({
           </p>
         </>
       ) : null}
+      <div
+        className="usage-breakdown"
+        aria-labelledby="usage-breakdown-heading"
+      >
+        <h4 id="usage-breakdown-heading">Chi tiết dung lượng</h4>
+        {breakdownQuery.isPending ? (
+          <p className="usage-message" role="status">
+            Đang tải chi tiết dung lượng...
+          </p>
+        ) : null}
+        {breakdownQuery.isError ? (
+          <div className="usage-message">
+            <p role="alert">Không thể tải chi tiết dung lượng.</p>
+            <button
+              type="button"
+              className="text-action"
+              onClick={() => void breakdownQuery.refetch()}
+            >
+              Thử tải chi tiết
+            </button>
+          </div>
+        ) : null}
+        {breakdownQuery.data ? (
+          <>
+            <dl className="usage-breakdown-list">
+              <div>
+                <dt>Tệp đang dùng</dt>
+                <dd>{formatBytes(BigInt(breakdownQuery.data.readyBytes))}</dd>
+              </div>
+              <div>
+                <dt>Thùng rác · vẫn tính quota</dt>
+                <dd>{formatBytes(BigInt(breakdownQuery.data.trashBytes))}</dd>
+              </div>
+              <div>
+                <dt>Upload đang giữ chỗ</dt>
+                <dd>{formatBytes(BigInt(breakdownQuery.data.pendingBytes))}</dd>
+              </div>
+            </dl>
+            {!breakdownQuery.data.matchesBalance ? (
+              <p className="usage-warning" role="alert">
+                Số liệu dung lượng chưa khớp với metadata tệp. Quản trị viên cần
+                kiểm tra; hệ thống không tự điều chỉnh quota.
+              </p>
+            ) : null}
+          </>
+        ) : null}
+      </div>
     </section>
   );
 }
