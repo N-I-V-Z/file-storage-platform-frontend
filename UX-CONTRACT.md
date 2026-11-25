@@ -16,6 +16,8 @@
 
 The selected project's usage card loads `GET /projects/:id/usage` after session restoration. It shows used bytes against quota, a percentage bar, and bytes reserved by uploads. Balance fields are decimal strings; validate them before `BigInt` arithmetic and format binary units for display. Loading and failed requests remain inside the card so project selection and API keys stay usable. A failed request offers retry. Switching projects clears the prior card immediately; never display one project's usage under another project's name.
 
+The card separately loads `GET /projects/:id/usage/breakdown`. It shows READY file bytes, trash and in-progress purge bytes (still charged), and upload reservations. A breakdown error has its own retry and leaves the quota summary visible. When `matchesBalance` is false, warn that stored metadata and quota counters disagree and direct the user to an administrator; never imply that the UI repairs the discrepancy. Upload, trash, restore, and purge invalidate both usage queries. A project switch clears the prior breakdown immediately.
+
 ## File explorer and transport
 
 The selected project shows only READY files from the private owner API. Search, MIME filter, sort, folder selection, and pagination are server backed; changing filters or folders returns to page one. Folder choices are all files, unfiled root, and flat project folders. Create and rename use Zod with React Hook Form; deleting a folder requires inline confirmation, and a nonempty folder reports the conflict without losing the retry action. Switching projects clears the previous project's file and folder view.
