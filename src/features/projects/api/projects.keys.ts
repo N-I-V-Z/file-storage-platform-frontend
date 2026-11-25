@@ -4,5 +4,5 @@ export const projectKeys = {
   usage: (userId: string, projectId: string) =>
     ["projects", "usage", userId, projectId] as const,
   usageBreakdown: (userId: string, projectId: string) =>
-    ["projects", "usage-breakdown", userId, projectId] as const,
+    ["projects", "usage", userId, projectId, "breakdown"] as const,
 };

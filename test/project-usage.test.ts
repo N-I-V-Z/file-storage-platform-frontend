@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import { ApiClient } from "../src/lib/http/api-client";
 import {
   getProjectUsage,
@@ -128,6 +129,16 @@ describe("project usage contract", () => {
     expect(projectKeys.usageBreakdown("user-a", projectId)).not.toEqual(
       projectKeys.usage("user-a", projectId),
     );
+  });
+
+  it("refreshes breakdown when an existing upload or trash action invalidates usage", async () => {
+    const client = new QueryClient();
+    const key = projectKeys.usageBreakdown("user-a", projectId);
+    client.setQueryData(key, breakdown);
+    await client.invalidateQueries({
+      queryKey: projectKeys.usage("user-a", projectId),
+    });
+    expect(client.getQueryState(key)?.isInvalidated).toBe(true);
   });
 
   it("formats binary bytes and percentages without Number precision loss", () => {
