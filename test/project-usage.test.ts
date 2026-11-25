@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import { ApiClient } from "../src/lib/http/api-client";
-import { getProjectUsage } from "../src/features/projects/api/projects.api";
+import {
+  getProjectUsage,
+  getProjectUsageBreakdown,
+} from "../src/features/projects/api/projects.api";
 import { projectKeys } from "../src/features/projects/api/projects.keys";
 import {
   formatBytes,
@@ -13,6 +17,13 @@ const balances = {
   quotaBytes: "10737418240",
   usedBytes: "5368709120",
   reservedBytes: "1048576",
+};
+const breakdown = {
+  ...balances,
+  readyBytes: "4294967296",
+  trashBytes: "1073741824",
+  pendingBytes: "1048576",
+  matchesBalance: true,
 };
 
 describe("project usage contract", () => {
@@ -64,6 +75,70 @@ describe("project usage contract", () => {
     expect(projectKeys.usage("user-a", projectId)).not.toEqual(
       projectKeys.usage("user-b", projectId),
     );
+  });
+
+  it("loads a private breakdown and rejects a foreign or inconsistent response", async () => {
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        expect(String(input)).toBe(
+          `http://localhost/api/v1/projects/${projectId}/usage/breakdown`,
+        );
+        expect(new Headers(init?.headers).get("Authorization")).toBe(
+          "Bearer access",
+        );
+        return Response.json({
+          success: true,
+          data: breakdown,
+          timestamp: "2026-11-20T00:00:00.000Z",
+        });
+      },
+    );
+    const client = new ApiClient(
+      "http://localhost/api/v1",
+      fetcher as typeof fetch,
+    );
+    client.setAccessToken("access");
+    await expect(getProjectUsageBreakdown(projectId, client)).resolves.toEqual(
+      breakdown,
+    );
+    for (const invalid of [
+      { ...breakdown, projectId: "00000000-0000-4000-8000-000000000002" },
+      { ...breakdown, trashBytes: "-1" },
+      { ...breakdown, readyBytes: "1" },
+    ]) {
+      const bad = new ApiClient(
+        "http://localhost/api/v1",
+        vi.fn(async () => Response.json(invalid)) as typeof fetch,
+      );
+      await expect(
+        getProjectUsageBreakdown(projectId, bad),
+      ).rejects.toMatchObject({ status: 502 });
+    }
+  });
+
+  it("keeps breakdown caches separate by account and project", () => {
+    expect(projectKeys.usageBreakdown("user-a", projectId)).not.toEqual(
+      projectKeys.usageBreakdown("user-b", projectId),
+    );
+    expect(projectKeys.usageBreakdown("user-a", projectId)).not.toEqual(
+      projectKeys.usageBreakdown(
+        "user-a",
+        "00000000-0000-4000-8000-000000000002",
+      ),
+    );
+    expect(projectKeys.usageBreakdown("user-a", projectId)).not.toEqual(
+      projectKeys.usage("user-a", projectId),
+    );
+  });
+
+  it("refreshes breakdown when an existing upload or trash action invalidates usage", async () => {
+    const client = new QueryClient();
+    const key = projectKeys.usageBreakdown("user-a", projectId);
+    client.setQueryData(key, breakdown);
+    await client.invalidateQueries({
+      queryKey: projectKeys.usage("user-a", projectId),
+    });
+    expect(client.getQueryState(key)?.isInvalidated).toBe(true);
   });
 
   it("formats binary bytes and percentages without Number precision loss", () => {

@@ -872,6 +872,43 @@ button {
 .usage-message p {
   margin: 0 0 8px;
 }
+.usage-breakdown {
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+.usage-breakdown h4 {
+  margin: 0;
+  font-size: 13px;
+}
+.usage-breakdown-list {
+  display: grid;
+  gap: 9px;
+  margin: 14px 0 0;
+}
+.usage-breakdown-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+}
+.usage-breakdown-list dt {
+  color: var(--muted);
+}
+.usage-breakdown-list dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+.usage-warning {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #f2c6ca;
+  border-radius: 7px;
+  color: var(--error);
+  background: #fff7f8;
+  font-size: 12px;
+}
 .files-section {
   margin-top: 31px;
   padding-top: 27px;
