@@ -57,6 +57,7 @@ describe("AuditPanel", () => {
     expect(await screen.findByText("Tải tệp lên")).toBeInTheDocument();
     expect(screen.getByText("API key 00000000")).toBeInTheDocument();
     expect(screen.getByText("Trang 1/1 · 1 hoạt động")).toBeInTheDocument();
+    expect(screen.queryByTitle(event.resourceId)).not.toBeInTheDocument();
     expect(screen.queryByText("private-document.pdf")).not.toBeInTheDocument();
   });
 

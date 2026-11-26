@@ -102,10 +102,7 @@ export function AuditPanel({
                     </td>
                     <td>{actionLabels[event.action]}</td>
                     <td>{actorLabel(event)}</td>
-                    <td
-                      className="audit-resource"
-                      title={event.resourceId ?? undefined}
-                    >
+                    <td className="audit-resource">
                       {event.resourceId ? event.resourceId.slice(0, 8) : "—"}
                     </td>
                   </tr>
