@@ -1,5 +1,9 @@
 # Project dashboard interaction contract
 
+## Public routes and project tabs
+
+`/login` and `/register` wait for the session check; signed-in users are redirected to `/dashboard` before a form appears. The landing page and `/docs` show guest actions only after that check, or a dashboard link for signed-in users. Project detail has five keyboard-operable tabs; Arrow, Home, and End change the active panel. Selecting another project returns to Tệp. During API key issuance, changing project or tab is disabled; switching away after issuance clears the revealed secret.
+
 ## Canonical UI Map
 
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
@@ -14,7 +18,7 @@
 
 ## Storage usage
 
-The selected project's usage card loads `GET /projects/:id/usage` after session restoration. It shows used bytes against quota, a percentage bar, and bytes reserved by uploads. Balance fields are decimal strings; validate them before `BigInt` arithmetic and format binary units for display. Loading and failed requests remain inside the card so project selection and API keys stay usable. A failed request offers retry. Switching projects clears the prior card immediately; never display one project's usage under another project's name.
+The selected project's usage card loads `GET /projects/:id/usage` when the Dung lượng tab opens. It shows used bytes against quota, a percentage bar, and bytes reserved by uploads. Balance fields are decimal strings; validate them before `BigInt` arithmetic and format binary units for display. Loading and failed requests remain inside the card so project selection and API keys stay usable. A failed request offers retry. Switching projects clears the prior card immediately; never display one project's usage under another project's name.
 
 The card separately loads `GET /projects/:id/usage/breakdown`. It shows READY file bytes, trash and in-progress purge bytes (still charged), and upload reservations. A breakdown error has its own retry and leaves the quota summary visible. When `matchesBalance` is false, warn that stored metadata and quota counters disagree and direct the user to an administrator; never imply that the UI repairs the discrepancy. Upload, trash, restore, and purge invalidate both usage queries. While uploads are active, refresh usage every two seconds and once again after success, failure, or cancellation so temporary reservations do not remain stale. A project switch clears the prior breakdown immediately.
 
@@ -30,7 +34,7 @@ Moving a READY file to trash requires an inline confirmation naming the file and
 
 ## Forms and mutations
 
-The selected project shows a read-only audit history after API key management. It loads owner-only events in pages of 10 and validates the project ID and event shape before display. The table shows time, action, actor type/short ID, and resource short ID; it never displays token, key name, filename, or storage path. Loading, empty, and failed states stay inside this section; a failed request offers retry. The owner can refresh the current page manually after a mutation. Switching projects resets to page one and does not show the previous project's rows. Deleted projects are unavailable through the owner history endpoint. The history table scrolls horizontally on narrow screens instead of clipping columns.
+The selected project shows read-only audit history in the Hoạt động tab. It loads owner-only events in pages of 10 and validates the project ID and event shape before display. The table shows time, action, actor type/short ID, and resource short ID; it never displays token, key name, filename, or storage path. Loading, empty, and failed states stay inside this section; a failed request offers retry. The owner can refresh the current page manually after a mutation. Switching projects resets to page one and does not show the previous project's rows. Deleted projects are unavailable through the owner history endpoint. The history table scrolls horizontally on narrow screens instead of clipping columns.
 
 Project creation and key creation use Zod with React Hook Form. Validate on submit, associate inline errors with fields, preserve nonsensitive input after API failure, block duplicate submissions, and show a form-level error. On project success, refresh the list and select the new project. Key issuance waits for server confirmation before showing success. Revoke has an inline confirmation naming the key; keep it open and show an error if the request fails. Do not expose project deletion in this phase because it also deletes keys.
 

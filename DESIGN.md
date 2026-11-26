@@ -32,6 +32,10 @@ components:
 
 # File Storage Platform Design System
 
+## Public pages and compact navigation
+
+The landing page explains project, file, and access workflows; `/docs` provides a practical guide. Both use the file index motif and share authentication-aware navigation. The selected project uses five tabs (Tệp, Dung lượng, Thùng rác, API key, Hoạt động) with only one panel mounted. Compact actions are bordered buttons; refresh uses an accessible SVG icon button. The landing hero enters once and its status dot pulses softly when reduced motion is not requested.
+
 ## Overview
 
 The visual reference is a quiet file index: aligned paths, compact metadata, and one clear action at a time. The current product serves people setting up private storage. Authentication, project/API key management, and the private file explorer are usable workflows. UI copy is Vietnamese; technical path labels may remain English. The home page carries the file index motif. Forms and dashboard keep conventional controls and restrained density. SVG file and project marks are the shared icon language; avoid font glyphs as structural icons.
@@ -44,7 +48,7 @@ The visual reference is a quiet file index: aligned paths, compact metadata, and
 
 Buttons have solid primary and outlined secondary styles, visible focus, hover, pressed, disabled, and busy text states. Hover changes color or shadow without shifting the control. Inputs use visible labels, 50px height on auth screens, associated inline errors, and `aria-invalid`. Submit errors stay in an alert near the action. The dashboard shows a loading status until the cookie session has been checked. Failed logout keeps the session visible and offers retry through the same button. The dashboard uses a compact project rail beside the selected project's detail, stacking them below 850px. The API key list shows scope tags and metadata; a separate panel shows a newly issued secret once with copy and close actions. Revoke uses an inline confirmation, not a modal.
 
-The file explorer sits below usage in the selected project detail. Folder chips, compact filters, upload drop area, and file rows share the same quiet borders and blue selected state. File rows show name, MIME, size, and short visible action labels; accessible names include the file name. Preview opens inline and can be closed without changing projects. Audit and admin tables share the same header, row, and pagination styling, with horizontal scrolling on narrow screens.
+The file explorer sits in the Tệp tab. Folder chips, compact filters, upload drop area, and file rows share the same quiet borders and blue selected state. File rows show name, MIME, size, and short visible action labels; accessible names include the file name. Preview opens inline and can be closed without changing projects. Audit and admin tables share the same header, row, and pagination styling, with horizontal scrolling on narrow screens.
 
 ## Motion and content
 
