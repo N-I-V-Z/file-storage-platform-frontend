@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/src/features/auth/hooks/use-auth";
+import { RefreshIcon } from "@/src/components/ui/refresh-icon";
 import { formatBytes } from "@/src/features/projects/usage-format";
 import {
   useAdminAuditEvents,
@@ -104,11 +105,13 @@ function AdminReports({ userId }: { userId: string }) {
           </div>
           <button
             type="button"
-            className="text-action"
+            className="icon-action"
+            aria-label="Làm mới tổng quan"
+            title="Làm mới tổng quan"
             onClick={() => void overview.refetch()}
             disabled={overview.isFetching}
           >
-            Làm mới
+            <RefreshIcon />
           </button>
         </div>
         {overview.isPending ? (
@@ -162,11 +165,13 @@ function AdminReports({ userId }: { userId: string }) {
           </div>
           <button
             type="button"
-            className="text-action"
+            className="icon-action"
+            aria-label="Làm mới projects"
+            title="Làm mới projects"
             onClick={() => void projects.refetch()}
             disabled={projects.isFetching}
           >
-            Làm mới
+            <RefreshIcon />
           </button>
         </div>
         {projects.isPending ? (
@@ -231,11 +236,13 @@ function AdminReports({ userId }: { userId: string }) {
           </div>
           <button
             type="button"
-            className="text-action"
+            className="icon-action"
+            aria-label="Làm mới hoạt động"
+            title="Làm mới hoạt động"
             onClick={() => void audit.refetch()}
             disabled={audit.isFetching}
           >
-            Làm mới
+            <RefreshIcon />
           </button>
         </div>
         {audit.isPending ? (
