@@ -6,9 +6,12 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ApiError } from "@/src/lib/http/api-client";
 import { ApiKeyPanel } from "@/src/features/api-keys/components/api-key-panel";
+import { FileExplorer } from "@/src/features/files/components/file-explorer";
+import { TrashPanel } from "@/src/features/files/components/trash-panel";
 import { createProject } from "../api/projects.api";
 import { projectKeys } from "../api/projects.keys";
 import { useProjects } from "../hooks/use-projects";
+import { ProjectUsagePanel } from "./project-usage-panel";
 import {
   createProjectSchema,
   type CreateProjectValues,
@@ -73,7 +76,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
   }
 
   return (
-    <section className="workspace-layout" aria-label="Projects">
+    <section id="projects" className="workspace-layout" aria-label="Projects">
       <aside className="project-rail">
         <div className="rail-heading">
           <h2>Projects</h2>
@@ -198,8 +201,23 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
               <span className="project-id">ID {selected.id}</span>
             </div>
             <p className="detail-intro">
-              Quản lý quyền truy cập và API key cho project này.
+              Theo dõi dung lượng và quản lý quyền truy cập cho project này.
             </p>
+            <ProjectUsagePanel
+              key={`usage-${selected.id}`}
+              userId={userId}
+              projectId={selected.id}
+            />
+            <FileExplorer
+              key={`files-${selected.id}`}
+              userId={userId}
+              projectId={selected.id}
+            />
+            <TrashPanel
+              key={`trash-${selected.id}`}
+              userId={userId}
+              projectId={selected.id}
+            />
             <ApiKeyPanel
               key={selected.id}
               projectId={selected.id}

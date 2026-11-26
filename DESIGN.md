@@ -34,7 +34,7 @@ components:
 
 ## Overview
 
-The visual reference is a quiet file index: aligned paths, compact metadata, and one clear action at a time. The current product serves people setting up private storage. Authentication and project/API key management are usable workflows; file management is a later phase. UI copy is Vietnamese; technical path labels may remain English. The home page carries the file index motif. Forms and dashboard keep conventional controls and restrained density.
+The visual reference is a quiet file index: aligned paths, compact metadata, and one clear action at a time. The current product serves people setting up private storage. Authentication, project/API key management, and the private file explorer are usable workflows. UI copy is Vietnamese; technical path labels may remain English. The home page carries the file index motif. Forms and dashboard keep conventional controls and restrained density.
 
 ## Tokens and layout
 
@@ -43,6 +43,8 @@ The visual reference is a quiet file index: aligned paths, compact metadata, and
 ## Components and states
 
 Buttons have solid primary and outlined secondary styles, visible focus, hover, pressed, disabled, and busy text states. Inputs use visible labels, 50px height, associated inline errors, and `aria-invalid`. Submit errors stay in an alert near the action. The dashboard shows a loading status until the cookie session has been checked. Failed logout keeps the session visible and offers retry through the same button. The dashboard uses a compact project rail beside the selected project's detail, stacking them below 850px. The API key list shows scope tags and metadata; a separate panel shows a newly issued secret once with copy and close actions. Revoke uses an inline confirmation, not a modal.
+
+The file explorer sits below usage in the selected project detail. Folder chips, compact filters, upload drop area, and file rows share the same quiet borders and blue selected state. File rows show name, MIME, size, and explicit preview/download actions; preview opens inline and can be closed without changing projects.
 
 ## Motion and content
 
