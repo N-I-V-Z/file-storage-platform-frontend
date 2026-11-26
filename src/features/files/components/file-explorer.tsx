@@ -284,7 +284,7 @@ export function FileExplorer({
                       setConfirmTrashId(file.id);
                     }}
                   >
-                    Thùng rác
+                    Bỏ vào thùng rác
                   </button>
                 </div>
                 {confirmTrashId === file.id ? (
