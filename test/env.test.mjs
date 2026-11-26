@@ -47,3 +47,22 @@ test("rejects non-HTTP and credential-bearing URLs", () => {
     /NEXT_PUBLIC_API_BASE_URL/,
   );
 });
+
+test("requires the app URL to be an origin for consistent SEO URLs", () => {
+  const valid = {
+    NEXT_PUBLIC_API_BASE_URL: "https://api.example.com/api/v1",
+    API_INTERNAL_URL: "http://127.0.0.1:4000/api/v1",
+    NEXT_PUBLIC_APP_URL: "https://storage.example.com",
+  };
+
+  for (const appUrl of [
+    "https://storage.example.com/app",
+    "https://storage.example.com/?preview=1",
+    "https://storage.example.com/#top",
+  ]) {
+    assert.throws(
+      () => readEnvironment({ ...valid, NEXT_PUBLIC_APP_URL: appUrl }),
+      /NEXT_PUBLIC_APP_URL.*origin/,
+    );
+  }
+});
