@@ -50,6 +50,7 @@ export function DashboardHome() {
           <nav className="dashboard-nav" aria-label="Dashboard">
             <a href="#projects">Projects</a>
             <a href="#account">Tài khoản</a>
+            <Link href="/docs">Hướng dẫn</Link>
             {user.role === "ADMIN" ? <Link href="/admin">Quản trị</Link> : null}
           </nav>
           <button

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/src/features/auth/hooks/use-auth";
+import { RefreshIcon } from "@/src/components/ui/refresh-icon";
 import { formatBytes } from "@/src/features/projects/usage-format";
 import {
   useAdminAuditEvents,
@@ -99,16 +100,18 @@ function AdminReports({ userId }: { userId: string }) {
       >
         <div className="admin-section-heading">
           <div>
-            <span className="eyebrow">01 / TỔNG QUAN</span>
+            <span className="eyebrow">BÁO CÁO / TỔNG QUAN</span>
             <h2 id="admin-overview-heading">Toàn hệ thống</h2>
           </div>
           <button
             type="button"
-            className="text-action"
+            className="icon-action"
+            aria-label="Làm mới tổng quan"
+            title="Làm mới tổng quan"
             onClick={() => void overview.refetch()}
             disabled={overview.isFetching}
           >
-            Làm mới
+            <RefreshIcon />
           </button>
         </div>
         {overview.isPending ? (
@@ -157,16 +160,18 @@ function AdminReports({ userId }: { userId: string }) {
       >
         <div className="admin-section-heading">
           <div>
-            <span className="eyebrow">02 / PROJECT</span>
+            <span className="eyebrow">BÁO CÁO / PROJECT</span>
             <h2 id="admin-projects-heading">Danh sách project</h2>
           </div>
           <button
             type="button"
-            className="text-action"
+            className="icon-action"
+            aria-label="Làm mới projects"
+            title="Làm mới projects"
             onClick={() => void projects.refetch()}
             disabled={projects.isFetching}
           >
-            Làm mới
+            <RefreshIcon />
           </button>
         </div>
         {projects.isPending ? (
@@ -226,16 +231,18 @@ function AdminReports({ userId }: { userId: string }) {
       <section className="admin-section" aria-labelledby="admin-audit-heading">
         <div className="admin-section-heading">
           <div>
-            <span className="eyebrow">03 / NHẬT KÝ</span>
+            <span className="eyebrow">BÁO CÁO / NHẬT KÝ</span>
             <h2 id="admin-audit-heading">Hoạt động gần đây</h2>
           </div>
           <button
             type="button"
-            className="text-action"
+            className="icon-action"
+            aria-label="Làm mới hoạt động"
+            title="Làm mới hoạt động"
             onClick={() => void audit.refetch()}
             disabled={audit.isFetching}
           >
-            Làm mới
+            <RefreshIcon />
           </button>
         </div>
         {audit.isPending ? (

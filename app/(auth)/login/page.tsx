@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { AuthForm } from "@/src/features/auth/components/auth-form";
 
 export const metadata: Metadata = {
-  title: "Đăng nhập | File Storage Platform",
+  title: "Đăng nhập",
+  description: "Đăng nhập vào không gian lưu trữ File Storage Platform.",
 };
 
 export default function LoginPage() {

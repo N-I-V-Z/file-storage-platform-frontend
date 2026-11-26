@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RefreshIcon } from "@/src/components/ui/refresh-icon";
 import { useAuditEvents } from "../hooks/use-audit-events";
 import type { AuditEvent } from "../schemas/audit.schemas";
 
@@ -47,11 +48,13 @@ export function AuditPanel({
         </div>
         <button
           type="button"
-          className="text-action"
+          className="icon-action"
+          aria-label="Làm mới lịch sử hoạt động"
+          title="Làm mới lịch sử hoạt động"
           onClick={() => void audit.refetch()}
           disabled={audit.isFetching}
         >
-          Làm mới
+          <RefreshIcon />
         </button>
       </div>
       <p className="audit-intro">

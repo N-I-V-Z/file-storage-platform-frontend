@@ -142,12 +142,14 @@ describe("ProjectWorkspace", () => {
       reservedBytes: "1048576",
     }));
     setup();
+    fireEvent.click(await screen.findByRole("tab", { name: "Dung lượng" }));
     expect(await screen.findByText("5 GiB / 10 GiB")).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute(
       "aria-valuenow",
       "50",
     );
     fireEvent.click(screen.getByRole("button", { name: "Documents" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Dung lượng" }));
     expect(await screen.findByText("1 GiB / 10 GiB")).toBeInTheDocument();
     expect(screen.queryByText("5 GiB / 10 GiB")).not.toBeInTheDocument();
     expect(getProjectUsage).toHaveBeenCalledWith(other.id);
@@ -164,6 +166,7 @@ describe("ProjectWorkspace", () => {
         reservedBytes: "0",
       });
     setup();
+    fireEvent.click(await screen.findByRole("tab", { name: "Dung lượng" }));
     expect(
       await screen.findByText("Không thể tải dung lượng."),
     ).toBeInTheDocument();
@@ -176,12 +179,13 @@ describe("ProjectWorkspace", () => {
     vi.mocked(listProjects).mockResolvedValue([project]);
     vi.mocked(getProjectUsage).mockReturnValue(new Promise(() => {}));
     setup();
+    fireEvent.click(await screen.findByRole("tab", { name: "Dung lượng" }));
     expect(await screen.findByText("Đang tải dung lượng...")).toHaveAttribute(
       "role",
       "status",
     );
     expect(screen.getByRole("heading", { name: "Media" })).toBeInTheDocument();
-    expect(screen.getByText("API keys")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "API key" })).toBeInTheDocument();
   });
 
   it("shows the three usage buckets and warns when counters disagree", async () => {
@@ -197,6 +201,7 @@ describe("ProjectWorkspace", () => {
       matchesBalance: false,
     });
     setup();
+    fireEvent.click(await screen.findByRole("tab", { name: "Dung lượng" }));
     expect(await screen.findByText("4 GiB")).toBeInTheDocument();
     expect(screen.getByText("1 GiB")).toBeInTheDocument();
     expect(screen.getByText("1 MiB")).toBeInTheDocument();
@@ -211,6 +216,7 @@ describe("ProjectWorkspace", () => {
     expect(
       await screen.findByRole("heading", { name: "Media" }),
     ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Hoạt động" }));
     expect(
       screen.getByRole("heading", { name: "Lịch sử hoạt động" }),
     ).toBeInTheDocument();
@@ -231,6 +237,7 @@ describe("ProjectWorkspace", () => {
         matchesBalance: true,
       });
     setup();
+    fireEvent.click(await screen.findByRole("tab", { name: "Dung lượng" }));
     expect(
       await screen.findByText("Không thể tải chi tiết dung lượng."),
     ).toBeInTheDocument();
@@ -259,9 +266,25 @@ describe("ProjectWorkspace", () => {
       }),
     );
     setup();
+    fireEvent.click(await screen.findByRole("tab", { name: "Dung lượng" }));
     expect(await screen.findByText("4 GiB")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Documents" }));
     expect(screen.queryByText("4 GiB")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Dung lượng" }));
     expect(await screen.findByText("1 GiB")).toBeInTheDocument();
+  });
+
+  it("shows one project panel at a time and supports arrow keys", async () => {
+    vi.mocked(listProjects).mockResolvedValue([project]);
+    setup();
+    const files = await screen.findByRole("tab", { name: "Tệp" });
+    expect(files).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("File Explorer")).toBeInTheDocument();
+    fireEvent.keyDown(files, { key: "ArrowRight" });
+    expect(screen.getByRole("tab", { name: "Dung lượng" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.queryByText("File Explorer")).not.toBeInTheDocument();
   });
 });

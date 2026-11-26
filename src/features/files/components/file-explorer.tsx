@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ApiError } from "@/src/lib/http/api-client";
+import { StorageIcon } from "@/src/components/ui/storage-icon";
 import { formatBytes } from "@/src/features/projects/usage-format";
 import { projectKeys } from "@/src/features/projects/api/projects.keys";
 import { moveToTrash } from "../api/trash.api";
@@ -238,7 +239,7 @@ export function FileExplorer({
             {page.items.map((file) => (
               <li key={file.id} className="files-item">
                 <span className="files-icon" aria-hidden="true">
-                  ▤
+                  <StorageIcon kind="file" />
                 </span>
                 <div className="files-item-name">
                   <strong>{file.originalName}</strong>
@@ -252,9 +253,10 @@ export function FileExplorer({
                     <button
                       type="button"
                       className="text-action"
+                      aria-label={`Xem ${file.originalName}`}
                       onClick={() => setPreviewFile(file)}
                     >
-                      Xem {file.originalName}
+                      Xem
                     </button>
                   ) : null}
                   {file.contentType === "video/mp4" && !canPreview(file) ? (
@@ -265,10 +267,11 @@ export function FileExplorer({
                   <button
                     type="button"
                     className="text-action"
+                    aria-label={`Tải ${file.originalName}`}
                     disabled={downloadingId === file.id}
                     onClick={() => void download(file)}
                   >
-                    Tải {file.originalName}
+                    Tải xuống
                   </button>
                   <button
                     type="button"
@@ -281,7 +284,7 @@ export function FileExplorer({
                       setConfirmTrashId(file.id);
                     }}
                   >
-                    Chuyển vào thùng rác
+                    Bỏ vào thùng rác
                   </button>
                 </div>
                 {confirmTrashId === file.id ? (

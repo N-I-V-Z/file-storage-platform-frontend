@@ -1,5 +1,11 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { GuestOnly } from "@/src/features/auth/components/guest-only";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,7 +18,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </span>
         </Link>
         <div className="auth-side-copy">
-          <span className="eyebrow">YOUR SPACE. YOUR RULES.</span>
+          <span className="eyebrow">MỘT WORKSPACE, MỌI PROJECT</span>
           <h2>Mọi tệp tin, một nơi để bắt đầu.</h2>
           <p>
             Một không gian lưu trữ có cấu trúc, được thiết kế để bạn kiểm soát
@@ -23,7 +29,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           FILE STORAGE PLATFORM <span>© 2026</span>
         </div>
       </div>
-      <div className="auth-main">{children}</div>
+      <div className="auth-main">
+        <GuestOnly>{children}</GuestOnly>
+      </div>
     </main>
   );
 }

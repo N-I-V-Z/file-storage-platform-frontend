@@ -24,10 +24,22 @@ function readHttpUrl(source: EnvironmentSource, name: string): string {
   return url.href.replace(/\/$/, "");
 }
 
+function readAppOrigin(source: EnvironmentSource): string {
+  const appUrl = readHttpUrl(source, "NEXT_PUBLIC_APP_URL");
+  const url = new URL(appUrl);
+  if (url.pathname !== "/" || url.search || url.hash) {
+    throw new Error(
+      "NEXT_PUBLIC_APP_URL must be an origin without a path, query, or fragment",
+    );
+  }
+
+  return url.origin;
+}
+
 export function readEnvironment(source: EnvironmentSource) {
   return {
     publicApiBaseUrl: readHttpUrl(source, "NEXT_PUBLIC_API_BASE_URL"),
     internalApiBaseUrl: readHttpUrl(source, "API_INTERNAL_URL"),
-    appUrl: readHttpUrl(source, "NEXT_PUBLIC_APP_URL"),
+    appUrl: readAppOrigin(source),
   };
 }
