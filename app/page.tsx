@@ -26,16 +26,17 @@ export default function Home() {
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-copy">
           <span className="eyebrow">
-            <span className="status-dot" /> LƯU TRỮ TỆP CHO ĐỘI NGŨ XÂY DỰNG
+            <span className="status-dot" /> KHÔNG GIAN LƯU TRỮ CHO NHÀ PHÁT
+            TRIỂN
           </span>
           <h1 id="hero-title">
-            Dữ liệu của bạn.
+            Tệp của bạn.
             <br />
-            <span>Trong tầm kiểm soát.</span>
+            <span>Quyền của bạn.</span>
           </h1>
           <p>
-            Quản lý tệp và quyền truy cập trên hạ tầng riêng. Một nền tảng rõ
-            ràng cho sản phẩm cần lưu trữ đáng tin cậy.
+            Tổ chức tệp theo project, kiểm soát khóa truy cập và theo dõi dung
+            lượng trong một workspace rõ ràng.
           </p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/register">
@@ -48,26 +49,35 @@ export default function Home() {
         </div>
         <div className="hero-diagram" aria-hidden="true">
           <div className="diagram-top">
-            <span>STORAGE / WORKSPACE</span>
-            <span>● LIVE</span>
+            <span>PROJECT / FILE INDEX</span>
+            <span>PRIVATE</span>
           </div>
           <div className="diagram-line">
-            <span className="folder-icon">▣</span>
+            <span className="folder-icon">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M3 6.5h6l2 2h10v9.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5Z"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
             <span>workspace</span>
             <span>01</span>
           </div>
           <div className="diagram-line nested">
             <span>╰─</span>
             <span>documents</span>
-            <span>12 files</span>
+            <span>12 tệp</span>
           </div>
           <div className="diagram-line nested">
             <span>╰─</span>
             <span>media</span>
-            <span>08 files</span>
+            <span>08 tệp</span>
           </div>
           <div className="diagram-card">
-            <span>PRIVATE BY DEFAULT</span>
+            <span>QUYỀN TRUY CẬP THEO PROJECT</span>
             <strong>
               Quyền truy cập
               <br />
@@ -79,7 +89,7 @@ export default function Home() {
       </section>
       <footer className="site-footer">
         <span>FILE STORAGE PLATFORM</span>
-        <span>Built for control. Ready to grow.</span>
+        <span>Lưu trữ có cấu trúc. Truy cập có kiểm soát.</span>
       </footer>
     </main>
   );

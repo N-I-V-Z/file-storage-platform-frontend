@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </span>
         </Link>
         <div className="auth-side-copy">
-          <span className="eyebrow">YOUR SPACE. YOUR RULES.</span>
+          <span className="eyebrow">MỘT WORKSPACE, MỌI PROJECT</span>
           <h2>Mọi tệp tin, một nơi để bắt đầu.</h2>
           <p>
             Một không gian lưu trữ có cấu trúc, được thiết kế để bạn kiểm soát
