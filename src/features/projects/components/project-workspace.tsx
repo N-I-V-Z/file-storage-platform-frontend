@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import { useForm } from "react-hook-form";
 import { ApiError } from "@/src/lib/http/api-client";
 import { StorageIcon } from "@/src/components/ui/storage-icon";
@@ -20,6 +20,15 @@ import {
   type Project,
 } from "../schemas/projects.schemas";
 
+const projectTabs = [
+  { id: "files", label: "Tệp" },
+  { id: "usage", label: "Dung lượng" },
+  { id: "trash", label: "Thùng rác" },
+  { id: "keys", label: "API key" },
+  { id: "audit", label: "Hoạt động" },
+] as const;
+type ProjectTab = (typeof projectTabs)[number]["id"];
+
 export function ProjectWorkspace({ userId }: { userId: string }) {
   const queryClient = useQueryClient();
   const projectsQuery = useProjects(userId);
@@ -27,7 +36,15 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState("");
   const [keyIssuing, setKeyIssuing] = useState(false);
+  const [activeTab, setActiveTab] = useState<ProjectTab>("files");
   const createTrigger = useRef<HTMLButtonElement>(null);
+  const tabRefs = useRef<Record<ProjectTab, HTMLButtonElement | null>>({
+    files: null,
+    usage: null,
+    trash: null,
+    keys: null,
+    audit: null,
+  });
   const {
     register,
     handleSubmit,
@@ -45,6 +62,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
         (current = []) => [project, ...current],
       );
       setSelectedId(project.id);
+      setActiveTab("files");
     },
   });
 
@@ -75,6 +93,32 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
     setFormError("");
     reset();
     createTrigger.current?.focus();
+  }
+
+  function selectProject(projectId: string) {
+    setSelectedId(projectId);
+    setActiveTab("files");
+  }
+
+  function handleTabKeyDown(
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) {
+    const nextIndex =
+      event.key === "ArrowRight"
+        ? (index + 1) % projectTabs.length
+        : event.key === "ArrowLeft"
+          ? (index - 1 + projectTabs.length) % projectTabs.length
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? projectTabs.length - 1
+              : -1;
+    if (nextIndex < 0 || keyIssuing) return;
+    event.preventDefault();
+    const next = projectTabs[nextIndex].id;
+    setActiveTab(next);
+    tabRefs.current[next]?.focus();
   }
 
   return (
@@ -116,7 +160,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
                       selected?.id === project.id ? "true" : undefined
                     }
                     disabled={keyIssuing && selected?.id !== project.id}
-                    onClick={() => setSelectedId(project.id)}
+                    onClick={() => selectProject(project.id)}
                   >
                     <span className="project-item-icon" aria-hidden="true">
                       <StorageIcon kind="project" />
@@ -202,34 +246,74 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
               </div>
               <span className="project-id">ID {selected.id}</span>
             </div>
-            <p className="detail-intro">
-              Theo dõi dung lượng và quản lý quyền truy cập cho project này.
-            </p>
-            <ProjectUsagePanel
-              key={`usage-${selected.id}`}
-              userId={userId}
-              projectId={selected.id}
-            />
-            <FileExplorer
-              key={`files-${selected.id}`}
-              userId={userId}
-              projectId={selected.id}
-            />
-            <TrashPanel
-              key={`trash-${selected.id}`}
-              userId={userId}
-              projectId={selected.id}
-            />
-            <ApiKeyPanel
-              key={selected.id}
-              projectId={selected.id}
-              onIssuingChange={setKeyIssuing}
-            />
-            <AuditPanel
-              key={`audit-${selected.id}`}
-              userId={userId}
-              projectId={selected.id}
-            />
+            <div
+              className="project-tabs"
+              role="tablist"
+              aria-label={`Quản lý ${selected.name}`}
+            >
+              {projectTabs.map((tab, index) => (
+                <button
+                  key={tab.id}
+                  ref={(node) => {
+                    tabRefs.current[tab.id] = node;
+                  }}
+                  id={`project-tab-${tab.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  aria-controls="project-tab-panel"
+                  tabIndex={activeTab === tab.id ? 0 : -1}
+                  disabled={keyIssuing && activeTab !== tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={(event) => handleTabKeyDown(event, index)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div
+              id="project-tab-panel"
+              role="tabpanel"
+              aria-labelledby={`project-tab-${activeTab}`}
+              className="project-tab-panel"
+              tabIndex={0}
+            >
+              {activeTab === "files" && (
+                <FileExplorer
+                  key={`files-${selected.id}`}
+                  userId={userId}
+                  projectId={selected.id}
+                />
+              )}
+              {activeTab === "usage" && (
+                <ProjectUsagePanel
+                  key={`usage-${selected.id}`}
+                  userId={userId}
+                  projectId={selected.id}
+                />
+              )}
+              {activeTab === "trash" && (
+                <TrashPanel
+                  key={`trash-${selected.id}`}
+                  userId={userId}
+                  projectId={selected.id}
+                />
+              )}
+              {activeTab === "keys" && (
+                <ApiKeyPanel
+                  key={selected.id}
+                  projectId={selected.id}
+                  onIssuingChange={setKeyIssuing}
+                />
+              )}
+              {activeTab === "audit" && (
+                <AuditPanel
+                  key={`audit-${selected.id}`}
+                  userId={userId}
+                  projectId={selected.id}
+                />
+              )}
+            </div>
           </>
         ) : (
           <div className="project-empty">
