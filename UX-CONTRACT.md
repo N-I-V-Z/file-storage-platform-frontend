@@ -41,3 +41,9 @@ The create response's token appears in one dedicated panel after success. It is 
 ## Responsive and accessibility
 
 On wide screens the project rail and detail panel sit side by side; on narrow screens they stack and scroll with the document. Controls remain reachable at short viewport heights. Use native checkboxes and select for the small fixed scope/expiry choices. Use buttons for actions, `aria-current` for selection, `role="alert"` for errors, and an announced status for loading/copy results. Focus returns to the relevant trigger after inline confirmation is canceled.
+
+## Administrator reports
+
+Only accounts with the current `ADMIN` role see the Quản trị link in the workspace header. `/admin` waits for session restoration, redirects signed-out visitors to login, and shows an access-denied state for signed-in `USER` accounts. The backend checks the database role on every admin request; hiding the link is only a navigation aid.
+
+The page contains three independent read-only sections: platform counts and byte totals, projects, and retained audit events. Project and audit tables page separately in groups of 20; a loading, empty, or failed section does not hide the other reports. Every failed request offers retry. Values from byte fields remain decimal strings until validated and formatted with `BigInt`. Project and audit query keys include the account and page; logout clears cached reports. The tables scroll horizontally on narrow screens. No admin create, edit, delete, quota, or role control appears in this phase.
