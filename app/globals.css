@@ -260,7 +260,7 @@ button {
     monospace;
 }
 .diagram-line span:last-child {
-  color: #8b98aa;
+  color: var(--muted);
   font-size: 11px;
 }
 .diagram-line.nested {
@@ -315,7 +315,7 @@ button {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  color: #8b98aa;
+  color: var(--muted);
   font:
     600 10px var(--font-geist-mono),
     monospace;
@@ -1661,30 +1661,37 @@ button {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
+  background: var(--white);
 }
 .audit-table {
   width: 100%;
   min-width: 610px;
   border-collapse: collapse;
   text-align: left;
-  font-size: 12px;
+  font-size: 13px;
 }
 .audit-table th,
 .audit-table td {
-  padding: 12px 14px;
+  padding: 13px 16px;
   border-bottom: 1px solid var(--line);
   vertical-align: top;
 }
 .audit-table th {
   color: var(--muted);
-  background: #f7f9fd;
-  font-size: 10px;
+  background: var(--surface-soft);
+  font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .audit-table tr:last-child td {
   border-bottom: 0;
+}
+.audit-table tbody tr:hover {
+  background: var(--surface-soft);
+}
+.audit-table time {
+  white-space: nowrap;
 }
 .audit-resource {
   font-family: var(--font-geist-mono), monospace;
@@ -1701,7 +1708,7 @@ button {
 }
 .audit-pagination > div {
   display: flex;
-  gap: 16px;
+  gap: 20px;
 }
 .audit-section .text-action:disabled {
   cursor: default;
@@ -1716,10 +1723,10 @@ button {
   color: var(--muted);
 }
 .admin-section {
-  margin-top: 38px;
+  margin-top: 28px;
   padding: clamp(22px, 3vw, 32px);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--white);
 }
 .admin-section-heading {
@@ -1745,8 +1752,8 @@ button {
   gap: 10px;
   padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #f9fbff;
+  border-radius: 8px;
+  background: var(--surface-soft);
 }
 .admin-metrics span {
   color: var(--muted);
@@ -1756,6 +1763,7 @@ button {
   font-size: clamp(20px, 2.5vw, 28px);
   letter-spacing: -0.04em;
   overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
 }
 .admin-message {
   margin: 0;
@@ -1779,6 +1787,16 @@ button {
   margin-top: 4px;
   color: var(--muted);
   font-family: var(--font-geist-mono), monospace;
+}
+@media (max-width: 620px) {
+  .files-item-actions {
+    width: 100%;
+    margin-left: 49px;
+    gap: 8px 16px;
+  }
+  .files-filters {
+    padding: 14px;
+  }
 }
 @media (max-width: 850px) {
   .admin-metrics {

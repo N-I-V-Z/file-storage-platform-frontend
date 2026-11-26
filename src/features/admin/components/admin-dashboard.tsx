@@ -99,7 +99,7 @@ function AdminReports({ userId }: { userId: string }) {
       >
         <div className="admin-section-heading">
           <div>
-            <span className="eyebrow">01 / TỔNG QUAN</span>
+            <span className="eyebrow">BÁO CÁO / TỔNG QUAN</span>
             <h2 id="admin-overview-heading">Toàn hệ thống</h2>
           </div>
           <button
@@ -157,7 +157,7 @@ function AdminReports({ userId }: { userId: string }) {
       >
         <div className="admin-section-heading">
           <div>
-            <span className="eyebrow">02 / PROJECT</span>
+            <span className="eyebrow">BÁO CÁO / PROJECT</span>
             <h2 id="admin-projects-heading">Danh sách project</h2>
           </div>
           <button
@@ -226,7 +226,7 @@ function AdminReports({ userId }: { userId: string }) {
       <section className="admin-section" aria-labelledby="admin-audit-heading">
         <div className="admin-section-heading">
           <div>
-            <span className="eyebrow">03 / NHẬT KÝ</span>
+            <span className="eyebrow">BÁO CÁO / NHẬT KÝ</span>
             <h2 id="admin-audit-heading">Hoạt động gần đây</h2>
           </div>
           <button
