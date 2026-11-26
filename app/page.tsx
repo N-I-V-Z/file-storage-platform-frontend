@@ -1,4 +1,37 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+const homeTitle = "Lưu trữ tệp và kiểm soát truy cập | File Storage Platform";
+const homeDescription =
+  "Tổ chức tệp theo project, quản lý API key và theo dõi dung lượng trong một workspace lưu trữ dành cho nhà phát triển.";
+
+export const metadata: Metadata = {
+  title: { absolute: homeTitle },
+  description: homeDescription,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: homeTitle,
+    description: homeDescription,
+    url: "/",
+    siteName: "File Storage Platform",
+    locale: "vi_VN",
+    type: "website",
+    images: [
+      {
+        url: "/og",
+        width: 1200,
+        height: 630,
+        alt: "File Storage Platform — Tệp của bạn. Quyền của bạn.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homeTitle,
+    description: homeDescription,
+    images: ["/og"],
+  },
+};
 
 export default function Home() {
   return (
