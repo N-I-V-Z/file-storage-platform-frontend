@@ -30,6 +30,8 @@ Moving a READY file to trash requires an inline confirmation naming the file and
 
 ## Forms and mutations
 
+The selected project shows a read-only audit history after API key management. It loads owner-only events in pages of 10 and validates the project ID and event shape before display. The table shows time, action, actor type/short ID, and resource short ID; it never displays token, key name, filename, or storage path. Loading, empty, and failed states stay inside this section; a failed request offers retry. The owner can refresh the current page manually after a mutation. Switching projects resets to page one and does not show the previous project's rows. Deleted projects are unavailable through the owner history endpoint. The history table scrolls horizontally on narrow screens instead of clipping columns.
+
 Project creation and key creation use Zod with React Hook Form. Validate on submit, associate inline errors with fields, preserve nonsensitive input after API failure, block duplicate submissions, and show a form-level error. On project success, refresh the list and select the new project. Key issuance waits for server confirmation before showing success. Revoke has an inline confirmation naming the key; keep it open and show an error if the request fails. Do not expose project deletion in this phase because it also deletes keys.
 
 ## API key secret
