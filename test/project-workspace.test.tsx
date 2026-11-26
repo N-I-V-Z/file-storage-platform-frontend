@@ -30,6 +30,9 @@ vi.mock("../src/features/files/components/file-explorer", () => ({
 vi.mock("../src/features/files/components/trash-panel", () => ({
   TrashPanel: () => <div>Thùng rác</div>,
 }));
+vi.mock("../src/features/audit/components/audit-panel", () => ({
+  AuditPanel: () => <h3>Lịch sử hoạt động</h3>,
+}));
 
 const project = {
   id: "00000000-0000-4000-8000-000000000001",
@@ -200,6 +203,17 @@ describe("ProjectWorkspace", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Số liệu dung lượng chưa khớp",
     );
+  });
+
+  it("offers project audit history in the selected workspace", async () => {
+    vi.mocked(listProjects).mockResolvedValue([project]);
+    setup();
+    expect(
+      await screen.findByRole("heading", { name: "Media" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Lịch sử hoạt động" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps the summary visible and retries a failed breakdown", async () => {
