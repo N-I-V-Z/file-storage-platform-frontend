@@ -476,15 +476,16 @@ button {
 }
 .dashboard-content {
   width: min(100% - 64px, 1060px);
-  margin: 80px auto;
+  margin: 52px auto 88px;
 }
 .dashboard-content h1 {
   margin: 18px 0 10px;
-  font-size: clamp(36px, 4vw, 56px);
-  letter-spacing: -0.06em;
+  font-size: clamp(34px, 3.8vw, 52px);
+  letter-spacing: -0.065em;
 }
 .dashboard-content > p {
   color: var(--muted);
+  line-height: 1.6;
 }
 .dashboard-content > p strong {
   color: var(--ink);
@@ -534,7 +535,9 @@ button {
 .dashboard-nav a {
   color: var(--muted);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 650;
+  padding: 9px 0;
+  transition: color 150ms;
 }
 .dashboard-nav a:hover {
   color: var(--blue);
@@ -549,7 +552,7 @@ button {
   margin-top: 24px;
   padding: 24px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 10px;
   background: white;
 }
 .account-panel h2 {
@@ -690,24 +693,25 @@ button {
 }
 
 .dashboard-content {
-  width: min(100% - 64px, 1220px);
+  width: min(100% - 64px, 1280px);
 }
 .workspace-layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: minmax(220px, 252px) minmax(0, 1fr);
   align-items: start;
-  gap: 22px;
-  margin-top: 44px;
+  gap: 24px;
+  margin-top: 34px;
 }
 .project-rail,
 .project-detail {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 14px;
-  background: white;
+  border-radius: 10px;
+  background: var(--white);
 }
 .project-rail {
   padding: 19px 13px 14px;
+  box-shadow: 0 6px 22px #1e3a6410;
 }
 .rail-heading {
   display: flex;
@@ -739,13 +743,17 @@ button {
   margin: 0 0 7px;
 }
 .text-action {
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 3px 0;
   border: 0;
   background: none;
   color: var(--blue);
   font-size: 13px;
   font-weight: 700;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .project-list {
   margin: 0;
@@ -756,7 +764,7 @@ button {
 }
 .project-item {
   width: 100%;
-  min-height: 44px;
+  min-height: 46px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -771,15 +779,21 @@ button {
   overflow-wrap: anywhere;
 }
 .project-item:hover {
-  background: #f2f5fb;
+  background: var(--surface-soft);
 }
 .project-item[aria-current="true"] {
-  background: #eaf0ff;
+  background: var(--surface-blue);
   color: var(--blue-dark);
+  box-shadow: inset 3px 0 var(--blue);
 }
 .project-item-icon {
   color: var(--blue);
-  font-size: 18px;
+  display: inline-flex;
+  flex: 0 0 18px;
+}
+.project-item-icon svg {
+  width: 18px;
+  height: 18px;
 }
 .rail-create {
   width: 100%;
@@ -822,7 +836,7 @@ button {
 }
 .project-detail {
   min-height: 390px;
-  padding: clamp(24px, 3vw, 38px);
+  padding: clamp(22px, 3vw, 38px);
 }
 .detail-heading {
   display: flex;
@@ -837,7 +851,7 @@ button {
   overflow-wrap: anywhere;
 }
 .project-id {
-  color: #8a98ac;
+  color: var(--muted);
   font:
     500 10px var(--font-geist-mono),
     monospace;
@@ -849,10 +863,10 @@ button {
   font-size: 14px;
 }
 .usage-section {
-  padding: 23px;
+  padding: clamp(18px, 2.5vw, 26px);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #f9fbff;
+  border-radius: 8px;
+  background: var(--surface-soft);
 }
 .usage-heading {
   display: flex;
@@ -875,7 +889,7 @@ button {
   margin-top: 19px;
   overflow: hidden;
   border-radius: 100px;
-  background: #dce5f4;
+  background: #dce5f2;
 }
 .usage-meter span {
   display: block;
@@ -930,8 +944,8 @@ button {
   font-size: 12px;
 }
 .files-section {
-  margin-top: 31px;
-  padding-top: 27px;
+  margin-top: 38px;
+  padding-top: 32px;
   border-top: 1px solid var(--line);
 }
 .files-heading {
@@ -952,10 +966,10 @@ button {
 }
 .folders-block {
   margin-top: 20px;
-  padding: 14px 16px;
+  padding: 18px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  background: #fbfcff;
+  background: var(--surface-soft);
 }
 .folders-heading,
 .folder-form,
@@ -979,7 +993,7 @@ button {
   margin-top: 12px;
 }
 .folders-nav button {
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 10px;
   border: 1px solid #cbd6e5;
   border-radius: 7px;
@@ -991,7 +1005,7 @@ button {
 .folders-nav button[aria-current="page"] {
   border-color: var(--blue);
   color: var(--blue);
-  background: #eef3ff;
+  background: var(--surface-blue);
 }
 .folder-entry {
   display: inline-flex;
@@ -1030,10 +1044,10 @@ button {
   font-weight: 700;
 }
 .upload-drop {
-  padding: 16px;
-  border: 1px dashed #aebed5;
+  padding: 22px;
+  border: 1px dashed var(--line-strong);
   border-radius: 9px;
-  background: #fbfcff;
+  background: var(--surface-soft);
 }
 .upload-drop[data-dragging="true"] {
   border-color: var(--blue);
@@ -1080,6 +1094,10 @@ button {
   align-items: end;
   gap: 10px;
   margin-top: 22px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-soft);
 }
 .files-filter-field {
   min-width: 0;
@@ -1129,7 +1147,7 @@ button {
   padding: 0;
   list-style: none;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 8px;
   overflow: hidden;
 }
 .files-item {
@@ -1137,9 +1155,12 @@ button {
   display: flex;
   align-items: center;
   gap: 13px;
-  padding: 14px 17px;
+  padding: 15px 18px;
   background: white;
   flex-wrap: wrap;
+}
+.files-item:hover {
+  background: var(--surface-soft);
 }
 .files-inline-confirm {
   flex: 1 0 100%;
@@ -1180,7 +1201,10 @@ button {
   border-radius: 8px;
   background: #eef3ff;
   color: var(--blue);
-  font-size: 20px;
+}
+.files-icon svg {
+  width: 20px;
+  height: 20px;
 }
 .files-item-name {
   min-width: 0;
@@ -1334,8 +1358,8 @@ button {
 }
 
 .keys-section {
-  margin-top: 31px;
-  padding-top: 27px;
+  margin-top: 38px;
+  padding-top: 32px;
   border-top: 1px solid var(--line);
 }
 .keys-heading {
@@ -1362,7 +1386,7 @@ button {
   padding: 22px;
   border: 1px dashed #cbd7e8;
   border-radius: 9px;
-  background: #fbfcff;
+  background: var(--surface-soft);
   color: var(--muted);
   font-size: 13px;
 }
@@ -1376,14 +1400,14 @@ button {
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #f9fbff;
+  background: var(--surface-soft);
 }
 .key-form .field input,
 .key-form .field select {
   width: 100%;
   height: 46px;
   padding: 0 13px;
-  border: 1px solid #cbd6e5;
+  border: 1px solid var(--line-strong);
   border-radius: 8px;
   background: white;
   color: var(--ink);
@@ -1415,8 +1439,8 @@ button {
   cursor: pointer;
 }
 .scope-option:has(input:checked) {
-  border-color: #a8bdf9;
-  background: #f2f5ff;
+  border-color: var(--blue);
+  background: var(--surface-blue);
 }
 .scope-option input {
   width: 17px;
@@ -1441,9 +1465,9 @@ button {
   gap: 11px;
   margin-top: 22px;
   padding: 23px;
-  border: 1px solid #a6baed;
+  border: 1px solid #9bb3e8;
   border-radius: 10px;
-  background: #f0f4ff;
+  background: var(--surface-blue);
 }
 .secret-panel > strong {
   font-size: 16px;
@@ -1491,7 +1515,7 @@ button {
 }
 .key-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   margin: 23px 0 0;
   padding: 0;
   list-style: none;
@@ -1500,8 +1524,11 @@ button {
   min-width: 0;
   padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fff;
+}
+.key-item:hover {
+  border-color: var(--line-strong);
 }
 .key-item-top {
   display: flex;
@@ -1599,8 +1626,8 @@ button {
 }
 
 .audit-section {
-  margin-top: 31px;
-  padding-top: 27px;
+  margin-top: 38px;
+  padding-top: 32px;
   border-top: 1px solid var(--line);
 }
 .audit-heading {

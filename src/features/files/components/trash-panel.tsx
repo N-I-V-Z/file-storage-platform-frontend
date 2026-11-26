@@ -5,6 +5,7 @@ import { useState } from "react";
 import { formatBytes } from "@/src/features/projects/usage-format";
 import { projectKeys } from "@/src/features/projects/api/projects.keys";
 import { ApiError } from "@/src/lib/http/api-client";
+import { StorageIcon } from "@/src/components/ui/storage-icon";
 import { listTrash, purgeTrash, restoreTrash } from "../api/trash.api";
 import { trashKeys } from "../api/trash.keys";
 
@@ -130,7 +131,7 @@ export function TrashPanel({
             {trashQuery.data.items.map((file) => (
               <li key={file.id} className="files-item">
                 <span className="files-icon" aria-hidden="true">
-                  ▤
+                  <StorageIcon kind="file" />
                 </span>
                 <div className="files-item-name">
                   <strong>{file.originalName}</strong>
@@ -148,10 +149,11 @@ export function TrashPanel({
                   <button
                     type="button"
                     className="text-action"
+                    aria-label={`Khôi phục ${file.originalName}`}
                     disabled={busy}
                     onClick={() => void action(file.id, "restore")}
                   >
-                    Khôi phục {file.originalName}
+                    Khôi phục
                   </button>
                   <button
                     type="button"

@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ApiError } from "@/src/lib/http/api-client";
+import { StorageIcon } from "@/src/components/ui/storage-icon";
 import { ApiKeyPanel } from "@/src/features/api-keys/components/api-key-panel";
 import { FileExplorer } from "@/src/features/files/components/file-explorer";
 import { TrashPanel } from "@/src/features/files/components/trash-panel";
@@ -118,7 +119,7 @@ export function ProjectWorkspace({ userId }: { userId: string }) {
                     onClick={() => setSelectedId(project.id)}
                   >
                     <span className="project-item-icon" aria-hidden="true">
-                      ▣
+                      <StorageIcon kind="project" />
                     </span>
                     <span>{project.name}</span>
                   </button>
