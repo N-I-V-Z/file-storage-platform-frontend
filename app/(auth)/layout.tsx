@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { GuestOnly } from "@/src/features/auth/components/guest-only";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -28,7 +29,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           FILE STORAGE PLATFORM <span>© 2026</span>
         </div>
       </div>
-      <div className="auth-main">{children}</div>
+      <div className="auth-main">
+        <GuestOnly>{children}</GuestOnly>
+      </div>
     </main>
   );
 }

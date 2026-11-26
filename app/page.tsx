@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { PublicHeader } from "@/src/features/auth/components/public-header";
+import { PublicHeroActions } from "@/src/features/auth/components/public-hero-actions";
 
 const homeTitle = "Lưu trữ tệp và kiểm soát truy cập | File Storage Platform";
 const homeDescription =
@@ -36,26 +38,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="site-shell">
-      <header className="site-header">
-        <Link
-          className="brand"
-          href="/"
-          aria-label="File Storage Platform, trang chủ"
-        >
-          <span className="brand-symbol">F</span>
-          <span>
-            file<span className="brand-muted">stack</span>
-          </span>
-        </Link>
-        <nav aria-label="Tài khoản" className="header-actions">
-          <Link className="text-link" href="/login">
-            Đăng nhập
-          </Link>
-          <Link className="button button-small" href="/register">
-            Bắt đầu
-          </Link>
-        </nav>
-      </header>
+      <PublicHeader />
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-copy">
           <span className="eyebrow">
@@ -71,14 +54,7 @@ export default function Home() {
             Tổ chức tệp theo project, kiểm soát khóa truy cập và theo dõi dung
             lượng trong một workspace rõ ràng.
           </p>
-          <div className="hero-actions">
-            <Link className="button button-primary" href="/register">
-              Tạo tài khoản <span aria-hidden="true">↗</span>
-            </Link>
-            <Link className="button button-outline" href="/login">
-              Đăng nhập
-            </Link>
-          </div>
+          <PublicHeroActions />
         </div>
         <div className="hero-diagram" aria-hidden="true">
           <div className="diagram-top">
@@ -118,6 +94,71 @@ export default function Home() {
             </strong>
             <span className="diagram-arrow">↗</span>
           </div>
+        </div>
+      </section>
+      <section className="landing-section" aria-labelledby="landing-flow-title">
+        <div className="section-heading">
+          <span className="eyebrow">BẮT ĐẦU TRONG BA BƯỚC</span>
+          <h2 id="landing-flow-title">Một nơi rõ ràng cho từng tệp.</h2>
+          <p>
+            Từ project đầu tiên đến lúc tích hợp ứng dụng, bạn luôn biết tệp
+            đang ở đâu và ai được truy cập.
+          </p>
+        </div>
+        <div className="landing-steps">
+          <article>
+            <span>01 / PROJECT</span>
+            <h3>Tạo không gian riêng</h3>
+            <p>
+              Nhóm tệp theo project và theo dõi dung lượng sử dụng trong cùng
+              một workspace.
+            </p>
+          </article>
+          <article>
+            <span>02 / FILES</span>
+            <h3>Tải lên và sắp xếp</h3>
+            <p>
+              Đưa tệp vào thư mục, tìm kiếm, xem trước và khôi phục từ thùng rác
+              khi cần.
+            </p>
+          </article>
+          <article>
+            <span>03 / ACCESS</span>
+            <h3>Cấp quyền có chủ đích</h3>
+            <p>
+              Tạo API key theo phạm vi truy cập để ứng dụng tải lên hoặc đọc tệp
+              của project.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section
+        className="landing-integration"
+        aria-labelledby="integration-title"
+      >
+        <div>
+          <span className="eyebrow">DÀNH CHO NHÀ PHÁT TRIỂN</span>
+          <h2 id="integration-title">
+            Đi từ giao diện đến API khi bạn sẵn sàng.
+          </h2>
+          <p>
+            Tệp được giữ riêng tư; API key giới hạn theo project và quyền. Xem
+            hướng dẫn để bắt đầu bằng giao diện hoặc tích hợp luồng upload.
+          </p>
+          <Link className="button button-primary" href="/docs">
+            Đọc hướng dẫn <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+        <div className="integration-card" aria-label="Ví dụ tích hợp">
+          <div>
+            <span>UPLOAD / API</span>
+            <span>PRIVATE</span>
+          </div>
+          <code>Authorization: ApiKey &lt;your-key&gt;</code>
+          <code>POST /api/v1/projects/:id/files</code>
+          <p>
+            Tải lên theo luồng. Không đưa khóa vào URL hoặc mã client công khai.
+          </p>
         </div>
       </section>
       <footer className="site-footer">
