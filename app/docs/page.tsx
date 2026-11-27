@@ -34,6 +34,7 @@ export default function DocsPage() {
           <a href="#organize">Quản lý tệp</a>
           <a href="#api">Tích hợp API</a>
           <a href="#security">Quyền truy cập</a>
+          <a href="#sharing">Chia sẻ tệp</a>
         </aside>
         <article className="docs-content">
           <div className="docs-intro">
@@ -111,6 +112,20 @@ export default function DocsPage() {
               Tệp được quét trước khi sẵn sàng tải xuống. Bạn có thể xem dung
               lượng trong tab <strong>Dung lượng</strong> và kiểm tra thao tác
               gần đây trong tab <strong>Hoạt động</strong>.
+            </p>
+          </section>
+          <section id="sharing">
+            <span className="docs-step">05 / SHARE</span>
+            <h2>Gửi tệp bằng link có thời hạn</h2>
+            <p>
+              Trong tab <strong>Tệp</strong>, chọn <strong>Chia sẻ</strong> ở
+              tệp đã quét và sẵn sàng. Chọn thời hạn 1 giờ, 24 giờ hoặc 7 ngày,
+              rồi tạo và sao chép link ngay. Link chỉ hiển thị một lần.
+            </p>
+            <p>
+              Người nhận mở link để tải tệp mà không cần đăng nhập. Bạn có thể
+              thu hồi link trong danh sách chia sẻ; chuyển tệp vào thùng rác
+              cũng thu hồi mọi link của tệp đó.
             </p>
           </section>
           <div className="docs-end">
