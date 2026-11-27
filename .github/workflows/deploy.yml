@@ -1,0 +1,38 @@
+name: Deploy frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 40-character commit SHA published by Quality
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Replace only the web app
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$VPS_PORT" =~ ^[0-9]+$ ]]
+          : "${VPS_HOST:?Missing VPS_HOST}"
+          : "${VPS_USERNAME:?Missing VPS_USERNAME}"
+          ssh -p "$VPS_PORT" -o BatchMode=yes \
+            -o PubkeyAuthentication=no -o PasswordAuthentication=no \
+            -o StrictHostKeyChecking=no \
+            "$VPS_USERNAME@$VPS_HOST" \
+            "env FSP_COMPOSE_FILE=compose.instabox.yaml FSP_ENV_FILE=.env.instabox bash /apps/file-storage-platform/deploy.sh frontend $IMAGE_TAG nivz0911"

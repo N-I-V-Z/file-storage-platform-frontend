@@ -44,7 +44,7 @@ describe("dashboard shell", () => {
 
   it("provides project and account navigation for a signed-in user", () => {
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: "user-a", email: "a@example.com" },
+      user: { id: "user-a", email: "a@example.com", role: "USER" },
       pending: false,
       logout: vi.fn(),
       login: vi.fn(),
@@ -62,6 +62,23 @@ describe("dashboard shell", () => {
       screen.getByRole("heading", { name: "Tài khoản" }),
     ).toBeInTheDocument();
     expect(screen.getByText("a@example.com")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Quản trị" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("links administrators to read-only reports", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: "admin-a", email: "admin@example.com", role: "ADMIN" },
+      pending: false,
+      logout: vi.fn(),
+      login: vi.fn(),
+    });
+    render(<DashboardHome />);
+    expect(screen.getByRole("link", { name: "Quản trị" })).toHaveAttribute(
+      "href",
+      "/admin",
+    );
   });
 
   it("shows route loading and a recoverable error without raw details", () => {

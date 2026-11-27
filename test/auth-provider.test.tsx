@@ -37,6 +37,7 @@ it("clears cached project data when the account changes or signs out", async () 
   vi.spyOn(apiClient, "login").mockResolvedValue({
     id: "user-a",
     email: "a@example.com",
+    role: "USER",
   });
   vi.spyOn(apiClient, "logout").mockResolvedValue(undefined);
   const queryClient = new QueryClient();

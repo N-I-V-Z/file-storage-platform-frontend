@@ -15,7 +15,7 @@ const wrapped = (status: number, data: unknown) =>
 
 describe("ApiClient", () => {
   it("reads enveloped register and login responses", async () => {
-    const user = { id: "u1", email: "a@example.com" };
+    const user = { id: "u1", email: "a@example.com", role: "USER" };
     const fetcher = vi.fn(async (input: RequestInfo | URL) =>
       String(input).endsWith("/auth/register")
         ? wrapped(201, user)
@@ -31,7 +31,7 @@ describe("ApiClient", () => {
   });
 
   it("refreshes and retries me with enveloped responses", async () => {
-    const user = { id: "u1", email: "a@example.com" };
+    const user = { id: "u1", email: "a@example.com", role: "ADMIN" };
     const fetcher = vi.fn(
       async (input: RequestInfo | URL, init?: RequestInit) => {
         const path = String(input);
@@ -92,7 +92,7 @@ describe("ApiClient", () => {
         if (path.endsWith("/auth/refresh"))
           return json(200, { accessToken: "fresh" });
         if (token === "Bearer stale") return json(401, {});
-        return json(200, { id: "u1", email: "a@example.com" });
+        return json(200, { id: "u1", email: "a@example.com", role: "USER" });
       },
     );
     const client = new ApiClient(

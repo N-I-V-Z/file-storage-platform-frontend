@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/src/providers/app-providers";
+import { readEnvironment } from "@/src/lib/env";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "File Storage Platform",
-  description: "Quản lý tệp và quyền truy cập trên hạ tầng riêng.",
+  metadataBase: new URL(readEnvironment(process.env).appUrl),
+  title: {
+    default: "File Storage Platform",
+    template: "%s | File Storage Platform",
+  },
+  description:
+    "Tổ chức tệp theo project, quản lý API key và theo dõi dung lượng lưu trữ.",
+  applicationName: "File Storage Platform",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
