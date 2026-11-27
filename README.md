@@ -19,4 +19,4 @@ docker build `
 
 The local `.env` file is excluded from the Docker build context and is not read by `docker build`. `NEXT_PUBLIC_*` values are embedded in the browser bundle during `next build`; rebuild the image if either public URL changes. `API_INTERNAL_URL` defaults to `http://backend:4000/api/v1` inside the production Compose network and is supplied to the container at runtime. The current InstaBox Compose bundle and first-start steps are in `../file-storage-platform-infra/README.instabox.md` in the shared workspace.
 
-The GitHub `Quality` workflow verifies pull requests. On `main`, it also publishes `latest` and commit-SHA images using the repository variables `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_API_BASE_URL`; the separate deploy workflow releases a selected SHA.
+The GitHub `Quality` workflow verifies pull requests. On `main`, it publishes `latest` and commit-SHA images using the repository variables `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_API_BASE_URL`, then deploys that SHA to InstaBox. The separate deploy workflow can release a selected SHA manually.
