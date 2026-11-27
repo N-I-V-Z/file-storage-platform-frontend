@@ -16,6 +16,8 @@ export const auditEventSchema = z.strictObject({
     "FILE_RESTORED",
     "FILE_PURGE_REQUESTED",
     "FILE_PURGED",
+    "SHARE_LINK_CREATED",
+    "SHARE_LINK_REVOKED",
   ]),
   resourceId: z.uuid().nullable(),
   occurredAt: z.iso.datetime(),
