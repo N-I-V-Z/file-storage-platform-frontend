@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PublicHeader } from "@/src/features/auth/components/public-header";
 import { PublicStartLink } from "@/src/features/auth/components/public-start-link";
+import { readEnvironment } from "@/src/lib/env";
 
 const title = "Hướng dẫn sử dụng | File Storage Platform";
 const description =
@@ -24,6 +25,8 @@ export const metadata: Metadata = {
 };
 
 export default function DocsPage() {
+  const apiBaseUrl = readEnvironment(process.env).publicApiBaseUrl;
+
   return (
     <main className="site-shell">
       <PublicHeader />
@@ -86,7 +89,7 @@ export default function DocsPage() {
             <div className="docs-code">
               <span>Ví dụ tải lên một tệp</span>
               <pre>
-                <code>{`curl -X POST "https://<api-host>/api/v1/projects/<project-id>/files" \\
+                <code>{`curl -X POST "${apiBaseUrl}/projects/<project-id>/files" \\
   -H "Authorization: ApiKey <your-key>" \\
   -F "file=@./example.pdf"`}</code>
               </pre>
