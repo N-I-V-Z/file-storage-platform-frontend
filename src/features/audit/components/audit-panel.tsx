@@ -16,6 +16,8 @@ const actionLabels: Record<AuditEvent["action"], string> = {
   FILE_RESTORED: "Khôi phục tệp",
   FILE_PURGE_REQUESTED: "Yêu cầu xóa vĩnh viễn",
   FILE_PURGED: "Đã xóa vĩnh viễn",
+  SHARE_LINK_CREATED: "Tạo link chia sẻ",
+  SHARE_LINK_REVOKED: "Thu hồi link chia sẻ",
 };
 
 function actorLabel(event: AuditEvent): string {

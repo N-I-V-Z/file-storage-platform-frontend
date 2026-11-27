@@ -1216,6 +1216,114 @@ button {
 .files-inline-confirm .form-error {
   color: var(--error);
 }
+.share-panel {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 8px 30px rgba(24, 48, 83, 0.06);
+}
+.share-panel-heading,
+.share-controls,
+.share-issued > div,
+.share-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.share-panel-heading {
+  justify-content: space-between;
+}
+.share-panel h4 {
+  margin: 5px 0 0;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.share-panel h5 {
+  margin: 20px 0 10px;
+  font-size: 13px;
+}
+.share-panel p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.share-controls label,
+.share-issued label {
+  font-size: 12px;
+  font-weight: 700;
+}
+.share-controls select,
+.share-issued input {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: white;
+  color: var(--ink);
+}
+.share-issued {
+  margin-top: 16px;
+  display: grid;
+  gap: 7px;
+}
+.share-issued input {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.share-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.share-list li {
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+.share-page {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 48px 20px;
+  background: var(--surface-soft);
+}
+.share-card {
+  width: min(100%, 540px);
+  padding: clamp(24px, 5vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 18px 55px rgba(24, 48, 83, 0.08);
+}
+.share-card h1 {
+  margin: 12px 0;
+  font-size: clamp(25px, 4vw, 36px);
+}
+.share-card p {
+  color: var(--muted);
+}
+.share-card > .button {
+  margin: 8px 8px 0 0;
+}
+.share-file {
+  display: grid;
+  gap: 4px;
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow-wrap: anywhere;
+}
+.share-file span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.share-status {
+  margin-top: 18px;
+}
 .trash-section {
   margin-top: 32px;
 }
