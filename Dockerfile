@@ -16,7 +16,9 @@ ARG API_INTERNAL_URL=http://backend:4000/api/v1
 ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 ENV API_INTERNAL_URL=${API_INTERNAL_URL}
-RUN test -n "$NEXT_PUBLIC_APP_URL" && test -n "$NEXT_PUBLIC_API_BASE_URL" && pnpm build
+RUN : "${NEXT_PUBLIC_APP_URL:?Pass --build-arg NEXT_PUBLIC_APP_URL=https://app.example.com}" \
+  && : "${NEXT_PUBLIC_API_BASE_URL:?Pass --build-arg NEXT_PUBLIC_API_BASE_URL=https://api.example.com/api/v1}" \
+  && pnpm build
 
 FROM node:22.23.2-bookworm-slim AS runtime
 ENV NODE_ENV=production
