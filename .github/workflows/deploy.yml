@@ -17,7 +17,6 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - name: Prepare SSH identity and pinned host key
         env:
@@ -34,18 +33,18 @@ jobs:
       - name: Replace only the web app
         env:
           IMAGE_TAG: ${{ inputs.image_tag }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_NAMESPACE: nivz0911
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_PORT: ${{ secrets.VPS_PORT }}
           VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
         run: |
           set -euo pipefail
           [[ "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]]
-          [[ "$DOCKER_USERNAME" =~ ^[a-z0-9_-]+$ ]]
+          [[ "$DOCKERHUB_NAMESPACE" =~ ^[a-z0-9_-]+$ ]]
           [[ "$VPS_PORT" =~ ^[0-9]+$ ]]
           : "${VPS_HOST:?Missing VPS_HOST}"
           : "${VPS_USERNAME:?Missing VPS_USERNAME}"
           ssh -i "$HOME/.ssh/id_ed25519" -p "$VPS_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=yes \
             "$VPS_USERNAME@$VPS_HOST" \
-            "bash ~/apps/file-storage-platform/deploy.sh frontend $IMAGE_TAG $DOCKER_USERNAME"
+            "bash ~/apps/file-storage-platform/deploy.sh frontend $IMAGE_TAG $DOCKERHUB_NAMESPACE"
