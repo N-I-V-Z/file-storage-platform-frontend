@@ -16,6 +16,7 @@ import { UploadPanel } from "./upload-panel";
 import { FilePreview } from "./file-preview";
 import { canPreview, saveDownload } from "../api/download.api";
 import type { StoredFile } from "../schemas/files.schemas";
+import { SharePanel } from "@/src/features/share-links/components/share-panel";
 import {
   explorerFiltersSchema,
   fileListParamsSchema,
@@ -56,6 +57,7 @@ export function FileExplorer({
     fileListParamsSchema.parse({}),
   );
   const [previewFile, setPreviewFile] = useState<StoredFile | null>(null);
+  const [shareFile, setShareFile] = useState<StoredFile | null>(null);
   const [downloadError, setDownloadError] = useState("");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const filesQuery = useFiles(userId, projectId, params);
@@ -77,6 +79,7 @@ export function FileExplorer({
 
   function applyFilters(values: ExplorerFilters) {
     setPreviewFile(null);
+    setShareFile(null);
     setParams((current) => ({
       ...current,
       page: 1,
@@ -110,6 +113,7 @@ export function FileExplorer({
       await trashMutation.mutateAsync(fileId);
       setConfirmTrashId(null);
       setPreviewFile(null);
+      setShareFile(null);
       if (
         params.page > 1 &&
         page &&
@@ -153,6 +157,7 @@ export function FileExplorer({
         selectedId={params.folderId}
         onSelect={(folderId) => {
           setPreviewFile(null);
+          setShareFile(null);
           setParams((current) => ({ ...current, folderId, page: 1 }));
         }}
       />
@@ -267,6 +272,19 @@ export function FileExplorer({
                   <button
                     type="button"
                     className="text-action"
+                    aria-label={`Chia sẻ ${file.originalName}`}
+                    aria-expanded={shareFile?.id === file.id}
+                    onClick={() =>
+                      setShareFile((current) =>
+                        current?.id === file.id ? null : file,
+                      )
+                    }
+                  >
+                    Chia sẻ
+                  </button>
+                  <button
+                    type="button"
+                    className="text-action"
                     aria-label={`Tải ${file.originalName}`}
                     disabled={downloadingId === file.id}
                     onClick={() => void download(file)}
@@ -336,6 +354,15 @@ export function FileExplorer({
           projectId={projectId}
           file={previewFile}
           onClose={() => setPreviewFile(null)}
+        />
+      ) : null}
+      {shareFile ? (
+        <SharePanel
+          key={shareFile.id}
+          userId={userId}
+          projectId={projectId}
+          file={shareFile}
+          onClose={() => setShareFile(null)}
         />
       ) : null}
 
