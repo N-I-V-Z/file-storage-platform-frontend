@@ -35,4 +35,4 @@ jobs:
             -o PubkeyAuthentication=no -o PasswordAuthentication=no \
             -o StrictHostKeyChecking=no \
             "$VPS_USERNAME@$VPS_HOST" \
-            "env FSP_COMPOSE_FILE=compose.instabox.yaml FSP_ENV_FILE=.env.instabox bash /apps/file-storage-platform/deploy.sh frontend $IMAGE_TAG nivz0911"
+            "env FSP_COMPOSE_FILE=compose.instabox.yaml FSP_ENV_FILE=.env.instabox bash /data/home/apps/file-storage-platform/deploy.sh frontend $IMAGE_TAG nivz0911"
