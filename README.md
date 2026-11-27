@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# File Storage Platform Frontend
 
-## Getting Started
+Next.js App Router interface for the file storage platform. Use `pnpm` and Node.js 22 (see `.nvmrc`).
 
-First, run the development server:
+## Local development
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Copy `.env.example` to `.env` and set the browser API URL, internal API URL, and application origin for your local services. Run `pnpm install`, then `pnpm dev`. Run `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before opening a pull request.
+
+## Build the Docker image
+
+From this repository directory in PowerShell, pass the two **public production URLs** explicitly. Replace the example domains with your own values:
+
+```powershell
+docker build `
+  --build-arg "NEXT_PUBLIC_APP_URL=https://app.example.com" `
+  --build-arg "NEXT_PUBLIC_API_BASE_URL=https://api.example.com/api/v1" `
+  -t "nivz0911/file-storage-platform-frontend:latest" .
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The local `.env` file is excluded from the Docker build context and is not read by `docker build`. `NEXT_PUBLIC_*` values are embedded in the browser bundle during `next build`; rebuild the image if either public URL changes. `API_INTERNAL_URL` defaults to `http://backend:4000/api/v1` inside the production Compose network and is supplied to the container at runtime. The current InstaBox Compose bundle and first-start steps are in `../file-storage-platform-infra/README.instabox.md` in the shared workspace.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The GitHub `Quality` workflow verifies pull requests. On `main`, it publishes `latest` and commit-SHA images using the repository variables `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_API_BASE_URL`, then deploys that SHA to InstaBox. The separate deploy workflow can release a selected SHA manually.
